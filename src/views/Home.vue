@@ -3,10 +3,10 @@
         <nav class="bk-horz-nav bk-horz-nav-min">
             <div class="bk-nav-logo fl">
                 <!-- <img src="https://magicbox.bkclouds.cc/static_api/v3/components_pro/horizontal_nav1/images/logo.png"> -->
-                目目学院客户管理系统
+                {{sysName}}
             </div>
             <div class="bk-nav-user fr">
-                <span class="mr5">admin</span>
+                <span class="mr5">{{sysUserName}}</span>
                 <img src="https://magicbox.bkclouds.cc/static_api/v3/components_pro/horizontal_nav1/images/avatar.png">
             </div>
         </nav>
@@ -23,12 +23,12 @@
                                 <span class="nav-name">人员管理</span>
                             </a>
                         </li>
-                        <li class="pureLink" :class="$route.path ==='/order-list'? 'open': ''">
-                            <a href="#/order-list" >
+                        <li class="pureLink" :class="($route.path ==='/orderConten'||$route.path ==='/orderInfo')? 'open': ''">
+                            <a href="#/orderConten">
                                 <span class="icon-box"><i class="bk-icon icon-order"></i></span>
                                 <span class="nav-name">用户订单</span>
                             </a>
-                        </li> 
+                        </li>
                     </ul>
                 </div>
                 <div class="copyright">
@@ -53,7 +53,7 @@ import '../style/css/common.css';
 export default {
     data() {
             return {
-                sysName: 'HtUi',
+                sysName: '目目学院客户管理系统',
                 collapsed: false,
                 sysUserName: '',
                 sysUserAvatar: '',
@@ -71,7 +71,7 @@ export default {
         },
         methods: {
             collapse: function() { //折叠导航栏
-                this.collapsed = !this.collapsed; 
+                this.collapsed = !this.collapsed;
             },
             pureLink: function() { //折叠导航栏
                 //this.collapsed = !this.collapsed; 
@@ -109,11 +109,11 @@ export default {
             }
         },
         mounted() {
-            var user = sessionStorage.getItem('user');
+            var user = sessionStorage.getItem('user'); 
             if (user) {
                 user = JSON.parse(user);
                 this.sysUserName = user.name || '';
-                this.sysUserAvatar = user.avatar || '';
+                this.sysUserAvatar = user.role || '';
             }
 
         }

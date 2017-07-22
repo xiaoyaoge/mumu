@@ -1,15 +1,11 @@
 <template>
-	<section>
-		main
-	</section>
+    <section>
+        main
+    </section>
 </template>
-
 <script>
-	export default {
-	}
-
+export default {}
 </script>
-
 <style scoped>
 
 </style>
