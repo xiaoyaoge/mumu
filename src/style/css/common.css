@@ -47,14 +47,14 @@ html, body {background: #fafafa; overflow: hidden; min-width: 1300px;}
 .info-label .label-title .bk-text-button{float: right;}
 .info-label .label-title .edit-btn{display: block;}
 .info-label .label-title .cancel-btn,
-.info-label .label-title .affirm-btn{display: none;}
+.info-label .label-title .affirm-btn{ }
 
-.info-label .nodata-cont{display: none; padding: 65px 25px 45px 25px;text-align: center;color: #ccc;}
+.info-label .nodata-cont{ padding: 65px 25px 45px 25px;text-align: center;color: #ccc;}
 .info-label.nodata .nodata-cont{display: block;}
-.info-label.nodata .label-title .edit-btn{display: none;}
-.info-label.nodata .label-cont{display: none;}
+.info-label.nodata .label-title .edit-btn{ }
+.info-label.nodata .label-cont{ }
 
-.info-label.edit .label-title .edit-btn{display: none;}
+.info-label.edit .label-title .edit-btn{ }
 .info-label.edit .label-title .cancel-btn,
 .info-label.edit .label-title .affirm-btn{display: block}
 

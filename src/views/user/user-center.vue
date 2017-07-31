@@ -22,7 +22,7 @@
                     </thead>
                     <tbody>
                         <tr v-for="(item,index) in dataList">
-                            <td>{{item.modifyTime}}</td>
+                            <td>{{dateTime(item.modifyDate)}}</td>
                             <td>{{item.name}}</td>
                             <td>{{item.mobile}}</td>
                             <td>
@@ -56,13 +56,19 @@
                     <el-form-item label="手机号码" prop="mobile">
                         <el-input v-model="editForm.mobile" auto-complete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="密码" prop="password">
-                        <el-input type="password" v-model="editForm.password" auto-complete="off"></el-input>
+                    <el-form-item label="密码" prop="">
+                        <el-input type="password" v-model="editForm.password" placeholder="............................" auto-complete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="角色" prop="orderType" class="type-class">
+                        <el-radio-group v-model="orderType">
+                            <el-radio-button label="超级管理员"></el-radio-button>
+                            <el-radio-button label="面签员"></el-radio-button>
+                        </el-radio-group>
                     </el-form-item>
                 </div>
             </el-form>
             <div class="dialog-btns">
-                <a class="bk-button bk-primary mr20" @click="editSubmit" title="保存">保存</a>
+                <a class="bk-button bk-primary mr10" @click="editSubmit" title="保存">保存</a>
                 <a class="bk-button bk-default" @click="editFormVisible = false" title="取消">取消</a>
             </div>
         </el-dialog>
@@ -79,16 +85,23 @@
                     <el-form-item label="密码" prop="password">
                         <el-input type="password" v-model="addForm.password" auto-complete="off"></el-input>
                     </el-form-item>
+                    <el-form-item label="角色" prop="orderType" class="type-class">
+                        <el-radio-group v-model="orderType">
+                            <el-radio-button label="超级管理员"></el-radio-button>
+                            <el-radio-button label="面签员"></el-radio-button>
+                        </el-radio-group>
+                    </el-form-item>
                 </div>
             </el-form>
             <div class="dialog-btns">
-                <a class="bk-button bk-primary mr20" @click="addSubmit" title="添加">添加</a>
+                <a class="bk-button bk-primary mr10" @click="addSubmit" title="添加">添加</a>
                 <a class="bk-button bk-default" @click="addFormVisible = false" title="取消">取消</a>
             </div>
         </el-dialog>
     </section>
 </template>
 <script>
+import moment from 'moment'
 export default {
     data() {
             return {
@@ -128,8 +141,7 @@ export default {
                     password: '',
                     role: 0
                 },
-                addFormVisible: false, //新增界面是否显示
-                addLoading: false,
+                addFormVisible: false, //新增界面是否显示 
                 addFormRules: {
                     name: [{
                         required: true,
@@ -147,17 +159,20 @@ export default {
                         trigger: 'blur'
                     }]
                 },
-                //新增界面数据
-                addForm: {
+                orderType: '超级管理员',
+                addForm: { //新增界面数据 
                     name: '',
                     mobile: '',
                     password: '',
-                    role: -1
+                    role: 1
                 }
 
             }
         },
         methods: {
+            dateTime(val) {
+                return moment(val).format('YYYY-MM-DD');
+            },
             handleCurrentChange(val) {
                 this.pageNum = val;
                 this.getDataList();
@@ -178,7 +193,7 @@ export default {
                 }
                 this.listLoading = true;
                 this.$http.ajaxPost({
-                    url: 'admin/getAdminList',
+                    url: 'admin/queryAdminList',
                     params: params
                 }, (res) => {
                     this.$http.aop(res, () => {
@@ -216,16 +231,18 @@ export default {
             //显示编辑界面
             handleEdit: function(index, row) {
                 this.editFormVisible = true;
-                this.editForm = Object.assign({}, row);
+                this.editForm = Object.assign({}, row); 
+                delete(this.editForm['modifyDate']); 
             },
             //显示新增界面
             handleAdd: function() {
                 this.addFormVisible = true;
+                this.orderType = '超级管理员'
                 this.addForm = {
                     name: '',
                     mobile: '',
                     password: '',
-                    role: -1
+                    role: 1
                 };
             },
             //编辑
@@ -234,6 +251,7 @@ export default {
                     if (valid) {
                         this.$confirm('确认要修改当前帐号吗？', '提示', {}).then(() => {
                             let para = Object.assign({}, this.editForm);
+                            para.role = ((this.orderType === '超级管理员') ? 99 : 1);
                             this.$http.ajaxPost({
                                 url: 'admin/modifyAdmin',
                                 params: para
@@ -259,13 +277,14 @@ export default {
                     if (valid) {
                         this.$confirm('确认提交吗？', '提示', {}).then(() => {
                             let para = Object.assign({}, this.addForm);
+                            para.role = ((this.orderType === '超级管理员') ? 99 : 1);
                             this.$http.ajaxPost({
-                                url: 'admin/addAdmin',
+                                url: 'admin/createAdmin',
                                 params: para
                             }, (res) => {
                                 this.$http.aop(res, () => {
                                     this.$message({
-                                        message: '修改成功',
+                                        message: '添加成功',
                                         type: 'success'
                                     });
                                     this.pageNum = 1;
@@ -280,7 +299,16 @@ export default {
             }
         },
         mounted() {
-            this.getUs(this.getDataList());
+            this.getUs(() => {
+                if (this.user.role === 99) {
+                    this.getDataList();
+                } else {
+                    this.$router.push({
+                        path: '/orderConten'
+                    });
+                }
+
+            });
 
         }
 }

@@ -26,9 +26,8 @@ body {
     width: 200px;
     height: 80px;
     margin: 20px auto;
-    background: #000;
-    overflow: hidden;
-    line-height: 900px;
+    background: url('../style/img/logo.png') center top;
+    background-repeat: no-repeat;
 }
 
 .index-cont input {
@@ -111,4 +110,3 @@ body {
     background-color: #4491e1;
     opacity: 1;
 }
-

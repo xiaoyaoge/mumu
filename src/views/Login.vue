@@ -1,7 +1,7 @@
 <template>
     <div class="index-cont">
         <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-position="left" label-width="0px" class="demo-ruleForm login-container">
-            <h1 class="logo">目目学院客户管理系统</h1>
+            <h1 class="logo"></h1>
             <input type="text" class="bk-form-input" v-model="ruleForm2.account" auto-complete="off" placeholder="账号"></input>
             <input type="password" class="bk-form-input" v-model="ruleForm2.checkPass" auto-complete="off" placeholder="密码"></input>
             <el-form-item prop="account"></el-form-item>
@@ -25,7 +25,7 @@ export default {
             return {
                 logining: false,
                 ruleForm2: {
-                    account: '12000009998',
+                    account: '13798437931',
                     checkPass: '123456'
                 },
                 rules2: {
@@ -60,10 +60,11 @@ export default {
                             params: loginParams
                         }, (res) => {
                             this.$http.aop(res, () => {
+                                sessionStorage.setItem('user', JSON.stringify(res.body.data)); 
                                 this.$router.push({
                                     path: '/users'
                                 }); 
-                                sessionStorage.setItem('user', JSON.stringify(res.body.data));
+
                             });
 
                         });

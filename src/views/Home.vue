@@ -18,12 +18,12 @@
                 <div class="nav-list">
                     <ul>
                         <li class="pureLink" :class="$route.path ==='/users'? 'open': ''">
-                            <a href="#/users">
+                            <a href="#/users" :class="sysUserAvatar!==99?'none':''">
                                 <span class="icon-box"><i class="bk-icon icon-user"></i></span>
                                 <span class="nav-name">人员管理</span>
                             </a>
                         </li>
-                        <li class="pureLink" :class="($route.path ==='/orderConten'||$route.path ==='/orderInfo')? 'open': ''">
+                        <li class="pureLink" :class="($route.path ==='/orderConten'||$route.path.indexOf('/orderInfo')>-1)? 'open': ''">
                             <a href="#/orderConten">
                                 <span class="icon-box"><i class="bk-icon icon-order"></i></span>
                                 <span class="nav-name">用户订单</span>
@@ -109,11 +109,14 @@ export default {
             }
         },
         mounted() {
-            var user = sessionStorage.getItem('user'); 
+            var user = sessionStorage.getItem('user');
             if (user) {
                 user = JSON.parse(user);
                 this.sysUserName = user.name || '';
                 this.sysUserAvatar = user.role || '';
+                if (this.sysUserAvatar !== 99) {
+                    this.$router.push('/orderConten');
+                }
             }
 
         }

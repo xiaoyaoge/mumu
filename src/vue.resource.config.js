@@ -8,18 +8,16 @@ let count = 0;
 
 Vue.use(VueResource);
 //Vue.http.options.emulateJSON = true;
+//Vue.http.options.root = 'http://119.23.52.238/cgi-admin/';
 Vue.http.options.root = 'http://localhost:8091/';
 //Vue.http.options.root = 'http://10.9.2.173:8080/'; 
- 
-// Vue.http.interceptors.push((req, next) => {
-//     count++;
-     
-//     next((res) => {
-//         if (--count === 0) {
-             
-//         }
-//     });
-// });
+
+Vue.http.interceptors.push((req, next) => {
+    count++;
+    next((res) => {
+        if (--count === 0) {}
+    });
+});
 
 Vue.http.aop = function(res, cb) {
     if (!res.ok) {
@@ -36,7 +34,7 @@ Vue.http.aop = function(res, cb) {
                 //window.location.href ='/login'
                 return;
                 // 异常
-            default: 
+            default:
                 Message.warning(res.body.errMsg || '服务器忙');
                 return;
         }
@@ -54,7 +52,7 @@ Vue.http.ajaxPost = function(obj, fun) {
         }).then((res) => {
         fun && fun(res);
     }, (res) => {
-        this.$http.aop(res);
+        Vue.http.aop(res);
     });
 
 }
