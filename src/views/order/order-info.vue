@@ -13,21 +13,31 @@
                     <!-- <h4>订单信息<span class="label label-primary fr">未审核</span></h4> -->
                     <ul class="list-group m0">
                         <li class="list-group-item"><span class="fl">用户姓名：</span><span class="name">{{orderInfo.name}}</span></li>
-                        <li class="list-group-item"><span class="fl">订单号：</span><span class="order">{{orderInfo.orderId}}</span></li>
+                        <li class="list-group-item">
+                            <span class="fl">订单号：</span>
+                            <span class="order">{{orderInfo.orderId}}</span>
+                            <span v-if="orderInfo.orderState==430" style="color:#4491e1" class="ml25">已还清</span> 
+                            <span v-if="orderInfo.orderState==100" style="color:#4491e1" class="ml25">带指派面签员</span>
+                            <span v-if="orderInfo.orderState==310" style="color:#4491e1" class="ml25">待审核并生成账单</span>
+                            <span v-if="orderInfo.orderState==330" style="color:#4491e1" class="ml25">待用户确认重组</span>
+                            <span v-if="orderInfo.orderState==333" style="color:#4491e1" class="ml25">我方代偿中</span>
+                            <span v-if="orderInfo.orderState==360" style="color:#4491e1" class="ml25">用户还款中</span>
+                            <span v-if="orderInfo.orderState==20" style="color:#4491e1" class="ml25">订单已关闭</span>
+                        </li>
                         <!-- <li class="list-group-item"><span class="fl">UID：</span><span class="fr">26556</span></li> -->
                     </ul>
                 </div>
-                <div class="info-btn">
+                <div v-if="orderInfo.orderState!==430" class="info-btn" style="width:50%;">
                     <a v-if="orderInfo.orderState!==20" @click="remarkOrder('关闭订单','close')" class="bk-button bk-default ml25" title="关闭申请"><span>关闭申请</span></a>
-                    <a v-if="orderInfo.orderState==330" @click="chongzuSubmit" class="bk-button bk-default ml25" title="回到重组状态"><span>回到重组状态</span></a>
-                    <a v-if="orderInfo.orderState" @click="deliveryFormVisible = true" class="bk-button bk-primary ml25" title="指派面签"><span>指派面签</span></a>
-                    <a v-if="orderInfo.orderState==330" @click="remarkOrder('订单信息确认','isOkOrder')" class="bk-button bk-primary ml25" title="信息确认"><span>信息确认</span></a>
-                    <a v-if="orderInfo.orderState" @click="changeUserInfo" class="bk-button bk-primary ml25" title="修改信息"><span>修改信息</span></a>
-                    <a v-if="orderInfo.orderState==430" @click="remarkOrder('代偿完成','finishOrder')" class="bk-button bk-primary ml25" title="代偿完成"><span>代偿完成</span></a>
+                    <!-- <a v-if="orderInfo.orderState==330" @click="chongzuSubmit" class="bk-button bk-default ml25" title="回到重组状态"><span>回到重组状态</span></a> -->
+                    <a v-if="orderInfo.orderState==300" @click="getDelivery" class="bk-button bk-primary ml25" title="指派面签"><span>指派面签</span></a>
+                    <a v-if="orderInfo.orderState==310" @click="remarkOrder('订单信息确认','isOkOrder')" class="bk-button bk-primary ml25" title="信息确认"><span>信息确认</span></a>
+                    <a v-if="orderInfo.orderState!==310&&orderInfo.orderState!==20" @click="remarkOrder('修改信息','chengeOrderInfo')" class="bk-button bk-primary ml25" title="修改信息" :class="orderInfo.orderState!==300?'':'none'"><span>修改信息</span></a>
+                    <!-- <a v-if="orderInfo.orderState==430" @click="remarkOrder('代偿完成','finishOrder')" class="bk-button bk-primary ml25" title="代偿完成"><span>代偿完成</span></a> -->
                     <a v-if="orderInfo.orderState==360" @click="remarkOrder('更新账单','updateOrder')" class="bk-button bk-primary ml25" title="更新账单"><span>更新账单</span></a>
-                    <div class="info-close none">
-                        <span class="ml15">订单已关闭</span>
-                        <a class="bk-button bk-default ml25" @click="remarkOrder('重新开启账单','open')" title="重新开启"><span>重新开启</span></a>
+                    <div class="info-close">
+                        <span v-if="orderInfo.orderState==20" class="ml15">订单已关闭</span>
+                        <a class="bk-button bk-default ml25 none" @click="remarkOrder('重新开启账单','open')" title="重新开启"><span>重新开启</span></a>
                     </div>
                 </div>
             </div>
@@ -46,29 +56,27 @@
                         <a class="bk-text-button bk-primary affirm-btn" :class="userInfoType.uinf?'':'none'" title="确认" @click="isOkChangUser">确认</a>
                     </div>
                     <div v-if="(userForm.name!=''||userForm.idCard!=''||orderInfo.userDegree!='')" class="label-cont mt15">
-                        <el-form :model="userForm" class="bk-form" label-textAlign="left" label-width="150px" ref="userForm">
+                        <el-form :model="userForm" class="bk-form" label-textAlign="left" label-width="120px" ref="userForm">
                             <div class="bk-form-item">
-                                <label class="bk-label ta-l" style="width:150px;">姓名：</label>
-                                <div class="bk-form-content" style="margin-left:150px;">
+                                <label class="bk-label ta-l" style="width:120px;">姓名：</label>
+                                <div class="bk-form-content" style="margin-left:120px;">
                                     <input type="text" class="bk-form-input" v-model="userForm.name" placeholder="" :readonly="userInfoType.ceUinf">
                                 </div>
                             </div>
                             <div class="bk-form-item mt5">
-                                <label class="bk-label ta-l" style="width:150px;">身份证号：</label>
-                                <div class="bk-form-content" style="margin-left:150px;">
+                                <label class="bk-label ta-l" style="width:120px;">身份证号：</label>
+                                <div class="bk-form-content" style="margin-left:120px;">
                                     <input type="text" class="bk-form-input" v-model="userForm.idCard" placeholder="" :readonly="userInfoType.ceUinf">
                                 </div>
                             </div>
                             <div class="bk-form-item mt5">
-                                <label class="bk-label ta-l" style="width:150px;">学历：</label>
-                                <div class="bk-form-content" style="margin-left:150px;">
+                                <label class="bk-label ta-l" style="width:120px;">学历：</label>
+                                <div class="bk-form-content" style="margin-left:120px;">
                                     <el-select v-model="userForm.userDegree" :class="userInfoType.ceUinf?'none':''">
-                                        <el-option label="大专" value="1"></el-option>
-                                        <el-option label="本科" value="2"></el-option>
-                                        <el-option label="硕士" value="4"></el-option>
+                                        <el-option v-for="item in degreeBox" :label="item.name" :value="item.id"></el-option> 
                                     </el-select>
                                     <!-- <input type="text" class="bk-form-input" v-model="orderInfo.degree" placeholder="" value="本科" :class="userInfoType.ceUinf?'none':''"> -->
-                                    <span :class="userInfoType.ceUinf?'':'none'" style=" float: left; width:100%; color: #666;text-align:right">{{degreeType(orderInfo.degree)}}</span>
+                                    <span :class="userInfoType.ceUinf?'':'none'" style=" float: left; width:100%; color: #666;text-align:right">{{degreeType(userForm.userDegree)}}</span>
                                 </div>
                             </div>
                             </form>
@@ -90,13 +98,21 @@
                     </div>
                     <div class="label-cont mt15" :class="userContact.length>0?'':'none'">
                         <form class="bk-form" id="validate_form" method="POST" action="javascript:;">
-                            <div v-for="(item,key) in userContact" class="bk-form-item">
-                                <label class="bk-label ta-l" style="width:150px; padding-top:0;padding-bottom:0;  ">
-                                    <input type="text" class="bk-form-input" style="width:85px;" placeholder="输入关系" v-model="item.relation" :readonly="userInfoType.cleUinf">：</label>
-                                <div class="bk-form-content" style="margin-left:150px;">
-                                    <input type="text" class="bk-form-input" placeholder="输入如：李四／13700000000" v-model="item.value" :readonly="userInfoType.cleUinf">
+                            <div v-for="(item,key) in userContact">
+                                <div class="bk-form-item">
+                                    <label class="bk-label ta-l" style="width:120px; padding-top:0;padding-bottom:0; padding-right: 20px;  "></label>
+                                     <div class="bk-form-content ta-r" style="margin-left:120px;">
+                                        <a class="bk-text-button bk-primary add-btn" :class="userInfoType.luinf?'':'none'" @click="deleteContact(key)">删除</a>
+                                    </div>
+                                </div> 
+                                <div  class="bk-form-item mt5 mb15"> 
+                                    <label class="bk-label ta-l" style="width:120px; padding-top:0;padding-bottom:0; padding-right: 20px;  ">
+                                        <input type="text" class="bk-form-input" style="width:80px;" placeholder="输入关系" v-model="item.relation" :readonly="userInfoType.cleUinf">：</label>
+                                    <div class="bk-form-content" style="margin-left:120px;"> 
+                                        <input type="text" class="bk-form-input" placeholder="输入如：李四／13700000000" v-model="item.value" :readonly="userInfoType.cleUinf"> 
+                                    </div> 
                                 </div>
-                            </div>
+                            </div> 
                         </form>
                     </div>
                     <div class="nodata-cont" :class="userContact.length>0?'none':''">无联系人细信息</div>
@@ -115,8 +131,14 @@
                     </div>
                     <div v-if="userGuarantor.length>0" class="label-cont mt15">
                         <form class="bk-form" id="validate_form" method="POST" action="javascript:;">
-                            <div v-for="(item,key) in userGuarantor" class="mt20">
-                                <div class="bk-form-item">
+                            <div v-for="(item,key) in userGuarantor" class="clearfix mt15">
+                                <div class="bk-form-item clearfix" :class="userInfoType.duinf?'':'none'">
+                                     <label class="bk-label ta-l" style="width:150px;"></label>
+                                    <div class="bk-form-content ta-r" style="margin-left:150px;">
+                                    <a class="bk-text-button bk-primary add-btn" @click="deleteGuarantor(key)">删除</a> 
+                                    </div>
+                                </div>
+                                <div class="bk-form-item mt5 clearfix">
                                     <label class="bk-label ta-l" style="width:150px;">姓名：</label>
                                     <div class="bk-form-content" style="margin-left:150px;">
                                         <input type="text" class="bk-form-input" v-model="item.name" placeholder="" :readonly="userInfoType.cdeUinf">
@@ -128,10 +150,15 @@
                                         <input type="text" class="bk-form-input" v-model="item.idCard" placeholder="" :readonly="userInfoType.cdeUinf">
                                     </div>
                                 </div>
-                                <div class="bk-form-item mt5">
+                                <div class="bk-form-item mt5 clearfix">
                                     <label class="bk-label ta-l" style="width:150px;">抵押物：</label>
-                                    <div class="bk-form-content" style="margin-left:150px;">
-                                        <input type="text" class="bk-form-input" v-model="item.pawns" placeholder="" :readonly="userInfoType.cdeUinf">
+                                     <div class="bk-form-content" style="margin-left:150px;">
+                                        <el-select v-model="item.pawns" :class="userInfoType.cdeUinf?'none':''">
+                                            <el-option v-for="item in pawnsBox" :label="item.name" :value="item.id"></el-option> 
+                                        </el-select> 
+                                        <span :class="userInfoType.cdeUinf?'':'none'" style=" float: left; width:100%; color: #666;text-align:right">{{pawnsType(item.pawns)}}</span>
+                                   
+                                        <!-- <input type="text" class="bk-form-input" v-model="item.pawns" placeholder="" :readonly="userInfoType.cdeUinf"> -->
                                     </div>
                                 </div>
                             </div>
@@ -150,7 +177,7 @@
                 </div>
                 <div class="bk-panel-action fr">
                     <div class="bk-form bk-inline-form bk-form-small">
-                        <button class="bk-button bk-primary bk-button-small" title="增加债务">增加债务</button>
+                        <button v-if="!typeofFun(repayInfo)&&orderInfo.orderState==310" class="bk-button bk-primary bk-button-small" @click="modifyDebt('添加账单','create',{})" title="增加债务">增加债务</button>
                     </div>
                 </div>
             </div>
@@ -172,15 +199,19 @@
                             <td class="text-r">{{item.amount}}</td>
                             <td>{{item.overdueStatus}}</td>
                             <td>{{item.overdueDays}}</td>
-                            <td><a class="bk-text-button" href="#none">查看图片</a></td>
                             <td>
-                                <a class="bk-text-button" href="#none">编辑</a>
-                                <a class="bk-text-button" href="#none">删除</a>
-                                <select name="" id="" class="select">
-                                    <option value="">未代偿</option>
-                                    <option value="">代偿中</option>
-                                    <option value="">已代偿</option>
+                                <a v-if="item.picUrlList" class="bk-text-button" @click="viewImg(item.picUrlList)">查看图片</a>
+                                <span v-else>没有图片</span>
+
+                            </td>
+                            <td>
+                                <a v-if="!typeofFun(repayInfo)&&orderInfo.orderState==310" class="bk-text-button" @click="modifyDebt('编辑账单','modify',item)">编辑</a>
+                                <a v-if="!typeofFun(repayInfo)&&orderInfo.orderState==310" class="bk-text-button" @click="delDebt(item.orderDebtId)">删除</a>
+                                <select v-if="!typeofFun(repayInfo)&&orderInfo.orderState==310" v-model="item.state" @change="changeOrderDebtState(item)"  class="select">
+                                    <option value="0">未代偿</option> 
+                                    <option value="1">已代偿</option>
                                 </select>
+                                <span v-if="typeofFun(repayInfo)||orderInfo.orderState!==310">-</span>
                             </td>
                         </tr>
                         <tr class="total">
@@ -195,14 +226,14 @@
                 </table>
             </div>
         </div>
-        <div class="bk-panel mt20">
+        <div v-if="typeofFun(repayPlan)" class="bk-panel mt20">
             <div class="bk-panel-header" role="tab">
                 <div class="bk-panel-info fl">
-                    <div class="panel-title">重组明细</div>
+                    <div  class="panel-title">重组明细</div>
                 </div>
                 <div class="bk-panel-action fr">
-                    <div class="bk-form bk-inline-form bk-form-small">
-                        <button class="bk-button bk-primary bk-button-small" title="修改">修改</button>
+                    <div v-if="userInfoType.payPlanInfo" class="bk-form bk-inline-form bk-form-small">
+                        <button v-if="!typeofFun(repayInfo)" class="bk-button bk-primary bk-button-small" @click="viewRepayPlan('modify')" title="修改">修改</button>
                     </div>
                 </div>
             </div>
@@ -219,31 +250,57 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(item,index) in repayInfo">
-                            <td class="text-r">{{item.capital}}</td>
-                            <td class="text-r">{{item.monFee}}</td>
-                            <td>{{item.fqNum}}</td>
-                            <td>{{item.overDueDays}}</td>
-                            <td>{{item.repayType}}</td>
-                            <td>
-                                <a class="bk-text-button" href="#none">查看详情</a>
-                            </td>
-                        </tr>
                         <tr>
-                            <td class="text-r">70,000</td>
-                            <td class="text-r">500</td>
-                            <td>80</td>
-                            <td>0</td>
-                            <td>等额本息按日计息</td>
+                            <td class="text-r">{{repayPlan.capital}}</td>
+                            <td class="text-r">{{repayPlan.monFee}}</td>
+                            <td>{{repayPlan.fqNum}}</td>
+                            <td>{{repayPlan.overDueDays}}</td>
+                            <td>{{repayPlan.repayType}}</td>
                             <td>
-                                <a class="bk-text-button" href="#none">查看详情</a>
+                                <a class="bk-text-button" @click="viewRepayPlan('view')">查看详情</a>
                             </td>
-                        </tr>
+                        </tr> 
                     </tbody>
                 </table>
             </div>
         </div>
-        <div class="bk-panel mt20 none">
+        <div v-if="typeofFun(repayInfo)" class="bk-panel mt20">
+            <div class="bk-panel-header" role="tab">
+                <div class="bk-panel-info fl">
+                    <div class="panel-title">还款明细</div>
+                </div>
+                <div class="bk-panel-action fr">
+                    <div v-if="userInfoType.payPlanInfo" class="bk-form bk-inline-form bk-form-small">
+                        <button class="bk-button bk-primary bk-button-small" @click="viewRepayInfo('modify')" title="修改">修改</button>
+                    </div>
+                </div>
+            </div>
+            <div class="bk-panel-body p0">
+                <table class="bk-table details-table has-thead-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-r">还款金额</th>
+                            <th class="text-r">手续费</th>
+                            <th>还款期数</th>
+                            <th>逾期天数</th> 
+                            <th style="width:360px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-r">{{repayInfo.capital}}</td>
+                            <td class="text-r">{{repayInfo.monFee}}</td>
+                            <td>{{repayInfo.fqNum}}</td>
+                            <td>{{repayInfo.overDueDays}}</td> 
+                            <td>
+                                <a class="bk-text-button" @click="viewRepayInfo('view')">查看详情</a>
+                            </td>
+                        </tr> 
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="bk-panel mt20">
             <div class="bk-panel-header" role="tab">
                 <div class="bk-panel-info fl">
                     <div class="panel-title">操作日志</div>
@@ -276,7 +333,7 @@
                 <div style="width: 90%; margin: 0 auto;">
                     <el-form-item label="面签员" prop="mid">
                         <el-select v-model="deliveryForm.mid" placeholder="请选择面签员">
-                            <el-option v-for="item in deliveryList" :label="item.name" :value="item.mid">
+                            <el-option v-for="item in deliveryList" :label="item.name":value="item.mid">
                             </el-option>
                         </el-select>
                     </el-form-item>
@@ -296,9 +353,8 @@
         <el-dialog :title="descTitle" v-model="descFormVisible" :close-on-click-modal="false">
             <el-form :model="descForm" label-width="80px" :rules="descFormRules" ref="descForm">
                 <div style="width: 90%; margin: 0 auto;">
-                    <el-form-item label="备注">
-                        <textarea style="height: 160px" class="bk-form-textarea" v-model="descForm.remark" placeholder="请填写备注信息"></textarea>
-                        <!-- <el-input type="textarea" style="height: 160px" class="bk-form-textarea" v-model="deliveryForm.desc" placeholder="请填写备注信息"></el-input> -->
+                    <el-form-item label="备注" prop="remark">
+                        <textarea style="height: 160px" class="bk-form-textarea" v-model="descForm.remark" placeholder="请填写备注信息"></textarea> 
                     </el-form-item>
                 </div>
             </el-form>
@@ -308,12 +364,252 @@
             </div>
         </el-dialog>
         <!-- 关闭用户申请 ]]-->
+        <el-dialog title="查看重组明细" v-model="repayPLanViewVisible" :close-on-click-modal="false"> 
+            <form class="bk-form" id="" method="POST" action="javascript:;">
+                    <table class="bk-table details-table has-thead-bordered">
+                        <thead>
+                            <tr>
+                                <th>期数</th>
+                                <th class="text-r">本金</th>
+                                <th class="text-r">利息</th>
+                                <th>还款日期</th>
+                                <!-- <th>实际还款日期</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item ,key) in repayPlanList">
+                                <td>{{item.repayIndex}}</td>
+                                <td class="text-r">{{item.capital}}</td>
+                                <td class="text-r">{{item.monFee}}</td>
+                                <td>{{item.repayDate}}</td>
+                                <!-- <td>{{item.repayDate}}</td> -->
+                            </tr> 
+                        </tbody>
+                    </table>
+            </form> 
+            <div class="dialog-btns"></div>
+        </el-dialog>
+        <el-dialog title="查看还款明细" v-model="repayInfoViewVisible" :close-on-click-modal="false"> 
+            <form class="bk-form" id="" method="POST" action="javascript:;">
+                    <table class="bk-table details-table has-thead-bordered">
+                        <thead>
+                            <tr>
+                                <th>期数</th>
+                                <th class="text-r">本金</th>
+                                <th class="text-r">利息</th>
+                                <th>逾期费</th>
+                                <th>还款日期</th>
+                                <th>实际还款日期</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item ,key) in repayInfoList">
+                                <td>{{key+1}}</td>
+                                <td class="text-r">{{item.capital}}</td>
+                                <td class="text-r">{{item.monFee}}</td>
+                                <td>{{item.penalty}}</td>
+                                <td>{{dateTime(item.repayDate)}}</td>
+                                <td>{{item.accountDate}}<span></span></td>
+                            </tr> 
+                        </tbody>
+                    </table>
+            </form> 
+            <div class="dialog-btns"></div>
+        </el-dialog>
+        <!-- 添加～修改账单-->
+        <el-dialog :title="debtTitle" v-model="debtFormVisible" :close-on-click-modal="false" @close="closeDebtDialog">
+            <el-form :model="debtForm" label-width="100px" :rules="debtFormRules" ref="debtForm">
+                <el-form-item label="债务平台" prop="platform">
+                    <el-input v-model="debtForm.platform" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="代还款金额" prop="amount">
+                    <el-input v-model="debtForm.amount" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="逾期天数" prop="overdueDays">
+                    <el-input v-model="debtForm.overdueDays" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="逾期情况" prop="overdueStatus">
+                    <el-input v-model="debtForm.overdueStatus" auto-complete="off"></el-input>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-upload 
+                        ref="upload"
+                        list-type="picture-card"
+                        :action="uploadPolicy.host" 
+                        :multiple="uploadConfig.multiple"
+                        :data="uploadConfig.data" 
+                        :on-success="uploadSuccess"
+                        :on-error="uploadError"
+                        :on-remove="uploadRemove"
+                        :accept="uploadConfig.accept"
+                        :file-list="fileList"
+                        :before-upload="beforeUpload" 
+                         >
+                      <i class="el-icon-plus"></i>
+                      <div slot="tip" class="el-upload__tip">只能上传jpg/png/jpeg/webp/gif文件，且不超过500kb</div>
+                    </el-upload> 
+                </el-form-item> 
+            </el-form>
+            <div class="dialog-btns" style="padding-left: 100px;">
+                <a class="bk-button bk-default" @click="debtFormVisible = false" title="点错了">点错了</a>
+                <a class="bk-button bk-primary mr10" @click="AddDebtSubmit(debtFormType)" title="确认">确认</a>
+            </div>
+        </el-dialog>
+        <!-- ／添加～修改账单 -->
+        <!-- /修改重组明细 -->
+        <el-dialog title="修改重组明细"  v-model="repayPlanFormVisible" :close-on-click-modal="false">
+            <el-form :model="repayPlanForm" label-width="100px" :rules="repayPlanForm" ref="repayPlanForm">
+                <table class="bk-table details-table has-thead-bordered">
+                    <thead>
+                        <tr>
+                            <th>期数</th>
+                            <th class="text-r">本金</th>
+                            <th class="text-r">利息</th>
+                            <th>还款日期</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item ,key) in repayPlanList">
+                            <td>{{key+1}}</td>
+                            <td class="text-r"><input v-model="item.capital" style="width:70px;" type="text" value="32"></td>
+                            <td class="text-r"><input v-model="item.monFee" style="width:70px;" type="text" value="32"></td>
+                            <td>
+                            <el-date-picker 
+                                size="mini" 
+                                format="yyyy-MM-dd" 
+                                type="date" 
+                                placeholder="选择日期" 
+                                v-model="item.repayDate"
+                                style="width:110px">
+                                    
+                                 </el-date-picker>
+                            <td><a class="bk-text-button bk-primary delete-btn" @click="deleteOneRayPlan(key)" title="删除">删除</a></td>
+                        </tr> 
+                    </tbody>
+                </table>
+                <div class="mt20" style="text-align: center;">
+                    <a class="add-btn mt25" @click="addOneRepayPlan()">
+                        <i></i>
+                        新增期数
+                    </a> 
+                </div>
+                
+            </el-form>
+            <div class="dialog-btns" style="padding: 20px 0 0 0; text-align: center;">
+                <a class="bk-button bk-default" @click="repayPlanFormVisible=false" title="点错了">点错了</a>
+                <a class="bk-button bk-primary mr10" @click="severRepayPlanSubmit()" title="确认">确认</a>
+            </div> 
+        </el-dialog> 
+        <!-- // 修改重组明细 -->
+        <!-- 修改还款明细 [[-->
+        <el-dialog title="修改还款明细"  v-model="repayInfoFormVisible" :close-on-click-modal="false">
+            <el-form :model="repayInfoForm" label-width="100px" :rules="repayInfoForm" ref="repayInfoForm">
+                <table class="bk-table details-table has-thead-bordered">
+                    <thead>
+                        <tr>
+                            <th>期数</th>
+                            <th class="text-r">本金</th>
+                            <th class="text-r" width="80px">利息</th> 
+                            <th width="80px">逾期费</th>
+                            <th width="102px">还款日期</th>
+                            <th width="130px">实际还款日期</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item ,key) in repayInfoList">
+                            <td>{{key+1}}</td>
+                            <td class="text-r">{{item.capital}}</td>
+                            <td class="text-r">
+                                <input v-if="item.repayState<20" v-model="item.monFee" style="width:60px;" type="text" value="32">
+                                <span v-else>{{item.monFee}}</span>
+                            </td>
+                            <td>
+                                <input v-if="(item.repayState<20&&item.penalty!=0)" v-model="item.penalty" style="width:60px;" type="text" value="32">
+                                <span v-else>{{item.penalty}}</span>
+                            </td>
+                            <td>
+                                <span>{{dateTime(item.repayDate)}}</span>
+                            </td>
+                            <td>
+                                <span>{{item.accountDate}}</span>
+                            </td>
+                        </tr> 
+                    </tbody>
+                </table>
+                <div class="dialog-btns" style="padding: 20px 0 0 0; text-align: center;">
+                    <a class="bk-button bk-default" @click="repayInfoFormVisible=false" title="点错了">点错了</a>
+                    <a class="bk-button bk-primary mr10" @click="severRepayInSubmit()" title="确认">确认</a>
+            </div>
+            </el-form>
+        </el-dialog>
+        <!-- 修改还款明细 ]]-->
+        <el-dialog title="查看图片" v-model="dialogImgVisible">
+            <div v-for="item in debtImgBox" style="width:100%">
+                <img :src="item" style="max-width: 100%;">
+            </div>
+        </el-dialog>
     </section>
 </template>
 <script>
+import moment from 'moment';
+import md5 from 'js-md5'; 
+// import FileUpload from '../../common/FileUpload/FileUpload.vue';
 export default {
     data() {
-            return {
+            return { 
+                picUrlList:[],
+                debtTitle:'编辑账单',
+                debtFormType:'create',
+                debtFormVisible:false,
+                dialogImgVisible:false,
+                dialogVisible:false,
+                dialogImageUrl:'',
+                debtImgBox:[], 
+                debtForm:{
+                    platform:'',
+                    amount:'',
+                    overdueDays:'',
+                    overdueStatus:'',
+                    picUrlList:[], 
+                },
+                debtFormRules: {
+                    platform: [{
+                        required: true,
+                        message: '请输入平台',
+                        trigger: 'blur'
+                    }],
+                    amount: [{
+                        required: true,
+                        message: '请输入金额',
+                        trigger: 'blur'
+                    }],
+                    overdueDays: [{
+                        required: true,
+                        message: '请输入逾期天数',
+                        trigger: 'blur'
+                    }],
+                    overdueStatus: [{
+                        required: true,
+                        message: '请输入逾期情况',
+                        trigger: 'blur'
+                    }]
+                },
+                pawnsBox:[
+                    {name:"房子",id:"1"},
+                    {name:"车子",id:"2"},
+                    {name:"保险",id:"3"},
+                    //{name:"其它",id:"4"}
+                ],
+                degreeBox:[
+                    {name:"高中及以下",id:"1"},
+                    {name:"中专",id:"2"},
+                    {name:"大专",id:"3"},
+                    {name:"本科",id:"4"},
+                    {name:"硕士",id:"5"},
+                    {name:"博士",id:"6"},
+                    {name:"其他",id:"7"}],
                 userInfoType: {
                     ceUinf: true, //点击编辑
                     eUinf: false, //个人信息显示修改
@@ -324,7 +620,9 @@ export default {
                     cdeUinf: true, //点击编辑
                     deUinf: false, //联系人信息显示修改
                     duinf: false, //个人显示 确认取消 
-                    type: false //修改按钮的显示
+                    debUinf: false,
+                    payPlan:false,
+                    payPlanInfo:false 
                 },
                 userContact: [], //联系人信息
                 userGuarantor: [], //担保人信息
@@ -347,21 +645,14 @@ export default {
                         trigger: 'blur'
                     }]
                 },
-                deliveryList: [{
-                    name: 'owen',
-                    mid: '7'
-                }, {
-                    name: '嗡嗡嗡1111',
-                    mid: '26'
-                }],
+                deliveryList: [],
                 deliveryFormVisible: false,
                 deliveryForm: {
                     orderId: '',
                     mid: '',
                     name: '',
                     remark: ''
-                },
-                deliveryMid: '',
+                }, 
                 deliveryFormRules: {
                     mid: [{
                         required: true,
@@ -392,11 +683,49 @@ export default {
                 orderInfo: {}, //订单信息
                 logList: [], //操作日志
                 debtList: [], //债务明细 
-                repayInfo: [], //重组明细
+                repayInfo: {}, //重组明细
+                repayPlan:{},
+                repayInfoList:[],
+                repayInfoFormVisible:false,
+                repayInfoFormViewVisible:false,
+                repayInfoViewVisible:false,
+                repayInfoForm:{},
+                repayPlanList:[],
+                repayPlanForm:{},
+                uploadPolicy: {},
+                uploadConfig: {
+                    multiple: true,
+                    thread: 5,
+                    data: {},
+                    accept: 'image/png,image/gif,image/jpeg,image/webp'
+                },
+                fileList:[],
+                repayPlanId:'',
+                repayPLanViewVisible:false,
+                repayPlanFormVisible:false, 
                 count: 0,
             }
         },
-        methods: {
+        methods: { 
+            handleRemove(file) {
+                console.log(file);
+            },
+            getPageName(url) { //获取文件名 
+                var tmp = new Array(); 
+                tmp = url.split("/"); 
+                return tmp[tmp.length-1]; 
+            },
+            dateTime(val) {
+                return moment(val).format('YYYY-MM-DD');
+            }, 
+            typeofFun(obg){//判断obj是否为空 空返回false，不为空返回true 
+                var strObj = JSON.stringify(obg);
+                if(strObj==='{}'){
+                    return false;
+                }else{
+                    return true;
+                }
+            },
             countFun() { //账单总金额
                 for (let i = 0; i < this.debtList.length; i++) {
                     this.count += this.debtList[i].amount;
@@ -411,31 +740,44 @@ export default {
                 }
                 return name;
             },
-            degreeType(val) {
-                switch (val) {
+            degreeType(val) {//
+                switch (parseInt(val)) {
                     case 1:
-                        return '专科';
+                        return '高中及以下';
                     case 2:
-                        return '本科';
+                        return '中专';
                     case 3:
-                        return '';
+                        return '大专';
                     case 4:
-                        return '硕士';
+                        return '本科';
                     case 5:
-                        return ' ';
+                        return '硕士';
                     case 6:
-                        return ' ';
+                        return '博士';
                     case 7:
-                        return ' ';
+                        return '其他';
                     default:
-                        return ' ';
+                        return '其他';
+                }
+            },
+            pawnsType(val){//抵押物
+                switch (parseInt(val)) {
+                    case 1:
+                        return '房子';
+                    case 2:
+                        return '车子';
+                    case 3:
+                        return '保险';
+                    case 4:
+                        return '其他';
+                    default:
+                        return '其他';
                 }
             },
             getDataList() { //获取订单详情
                 let params = {};
                 params = {
                     orderId: this.orderInfo.orderId,
-
                 }
                 this.infoLoading = true;
                 this.$http.ajaxPost({
@@ -443,9 +785,13 @@ export default {
                     params: params
                 }, (res) => {
                     this.$http.aop(res, () => {
+                        if(res.body.data.order.orderState==310){
+                            this.changeUserInfo();
+                        }
                         this.orderInfo = res.body.data.order;
-                        this.repayInfo = res.body.data.repayInfo;
-                        //this.logList = res.body.data.logList;
+                        this.repayInfo = res.body.data.repayInfo||{};
+                        this.repayPlan = res.body.data.repayPlan||{};
+                        this.logList = res.body.data.logList;
                         this.debtList = res.body.data.debtList;
                         this.userForm.orderId = this.orderInfo.orderId;
                         this.userForm.userDegree = this.orderInfo.degree + '';
@@ -455,10 +801,11 @@ export default {
                         this.infoLoading = false;
                         this.gitUserContact();
                         this.gitUserGuarantor();
+
                     });
                 });
             },
-            gitUserGuarantor() {
+            gitUserGuarantor() {//获取担保人信息
                 let params = {};
                 params = {
                     uid: this.orderInfo.uid,
@@ -470,12 +817,12 @@ export default {
                     params: params
                 }, (res) => {
                     this.$http.aop(res, () => {
-                        this.userGuarantor = res.body.data.userGuarantor || [];
+                        this.userGuarantor = res.body.data.guarantorList || []; 
                         this.infoLoading = false;
                     });
                 });
             },
-            addGuarantor() {
+            addGuarantor() {//添加担保人
                 var guarantor = {
                     gid: '',
                     idCard: '',
@@ -484,7 +831,10 @@ export default {
                 };
                 this.userGuarantor.push(guarantor);
             },
-            addContact() {
+            deleteGuarantor(key){
+                this.userGuarantor.splice(key,1);
+            },
+            addContact() {//添加联系人
                 var contact = {
                     cid: '',
                     mobile: '',
@@ -494,7 +844,10 @@ export default {
                 }
                 this.userContact.push(contact);
             },
-            gitUserContact() {
+            deleteContact(key){
+                this.userContact.splice(key,1);
+            },
+            gitUserContact() {//获取联系人信息
                 let params = {};
                 params = {
                     uid: this.orderInfo.uid,
@@ -510,12 +863,12 @@ export default {
                             this.userContact[i].value = this.userContact[i].name + '／' + this.userContact[i].mobile;
                         }
                     });
-                });
-
-            },
+                }); 
+            }, 
             isOkChangUser() { // 确认修个人信息
                 this.$confirm('是否确认，修改当前用户信息？', '提示', {}).then(() => {
                     let para = Object.assign({}, this.userForm);
+                    para.degree = para.userDegree;
                     delete(para['userDegree']);
                     this.$http.ajaxPost({
                         url: 'order/modifyUser',
@@ -528,12 +881,18 @@ export default {
                             });
                             this.pageNum = 1;
                             this.getDataList();
+                            this.notChangUser();
                         })
                     });
 
-                });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });       
             },
-            isOkContact() {
+            isOkContact() {//保存联系人
                 var params = {
                     contactList: [],
                     uid: this.orderInfo.uid
@@ -544,47 +903,11 @@ export default {
                         cid: this.userContact[i].cid,
                         name: aVal[0],
                         mobile: aVal[1],
-                        relation: this.userContact[i].relation
-
+                        relation: this.userContact[i].relation 
                     }
-                    params.contactList.push(val);
-
-
+                    params.contactList.push(val);  
                 }
                 this.$confirm('是否确认，修改联系人信息？', '提示', {}).then(() => {
-                    this.$http.ajaxPost({
-                        url: 'order/modifyGuarantor',
-                        params: params
-                    }, (res) => {
-                        this.$http.aop(res, () => {
-                            this.$message({
-                                message: '修改成功',
-                                type: 'success'
-                            });
-                            this.pageNum = 1;
-                            this.getDataList();
-                        })
-                    });
-
-                });
-            },
-            isOkGuarantor() {
-                var params = {
-                    guarantorList: [],
-                    uid: this.orderInfo.uid
-                };
-                for (let i = 0; i < this.userGuarantor.length; i++) {
-
-                    let val = {
-                        gid: this.userGuarantor[i].gid || 0,
-                        name: this.userGuarantor[i].name,
-                        mobile: this.userGuarantor[i].idCard,
-                        pawns: this.userGuarantor[i].pawns
-                    }
-                    params.guarantorList.push(val);
-
-                }
-                this.$confirm('是否确认，修改担保信息？', '提示', {}).then(() => {
                     this.$http.ajaxPost({
                         url: 'order/modifyContact',
                         params: params
@@ -596,24 +919,66 @@ export default {
                             });
                             this.pageNum = 1;
                             this.getDataList();
+                            this.notChangContact(); 
                         })
                     });
 
-                });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });       
+            },  
+            isOkGuarantor() {//保存担保人
+                var params = {
+                    guarantorList: [],
+                    uid: this.orderInfo.uid
+                };
+                for (let i = 0; i < this.userGuarantor.length; i++) { 
+                    let val = {
+                        gid: this.userGuarantor[i].gid || 0,
+                        name: this.userGuarantor[i].name,
+                        idCard: this.userGuarantor[i].idCard,
+                        pawns: this.userGuarantor[i].pawns
+                    }
+                    params.guarantorList.push(val);
+
+                }
+                this.$confirm('是否确认，修改担保信息？', '提示', {}).then(() => {
+                    this.$http.ajaxPost({
+                        url: 'order/modifyGuarantor',
+                        params: params
+                    }, (res) => {
+                        this.$http.aop(res, () => {
+                            this.$message({
+                                message: '修改成功',
+                                type: 'success'
+                            });
+                            this.pageNum = 1;
+                            this.getDataList();
+                            this.notChangGuarantor();
+                        })
+                    });
+
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });       
             },
             notChangContact() { //取消修改联系人信息
                 this.gitUserContact();
                 this.userInfoType.cleUinf = true;
                 this.userInfoType.leUinf = true;
-                this.userInfoType.luinf = false;
-
+                this.userInfoType.luinf = false; 
             },
             notChangGuarantor() { //取消修改担保人信息
                 this.gitUserGuarantor();
                 this.userInfoType.cdeUinf = true;
                 this.userInfoType.deUinf = true;
                 this.userInfoType.duinf = false;
-
             },
             notChangUser() { //取消修改个人信息
                 this.userInfoType.ceUinf = true;
@@ -638,25 +1003,48 @@ export default {
                 this.userInfoType.eUinf = false;
                 this.userInfoType.uinf = true;
             },
-            changeUserInfo() { //修改信息 按钮
-                if (!this.userInfoType.type) {
+            changeUserInfo() { //显示 修改信息 按钮  
                     this.userInfoType.eUinf = true;
                     this.userInfoType.leUinf = true;
                     this.userInfoType.deUinf = true;
-                    this.userInfoType.type = true;
-                } else {
-                    this.userInfoType.type = false;
-                    this.userInfoType.ceUinf = true; //点击编辑
-                    this.userInfoType.eUinf = false; //个人信息显示修改
-                    this.userInfoType.uinf = false; //个人显示 确认取消
-                    this.userInfoType.cleUinf = true; //点击编辑
-                    this.userInfoType.leUinf = false; //联系人信息显示修改
-                    this.userInfoType.luinf = false; //个人显示 确认取消
-                    this.userInfoType.cdeUinf = true; //点击编辑
-                    this.userInfoType.deUinf = false; //联系人信息显示修改
-                    this.userInfoType.duinf = false; //个人显示 确认取消 
-                    this.userInfoType.type = false; //修改按钮的显示 
-                }
+                    this.userInfoType.type = true; 
+                    this.userInfoType.payPlan =true;
+                    this.userInfoType.payPlanInfo =true;
+
+                    // this.userInfoType.type = false;
+                    // this.userInfoType.ceUinf = true; //点击编辑
+                    // this.userInfoType.eUinf = false; //个人信息显示修改
+                    // this.userInfoType.uinf = false; //个人显示 确认取消
+                    // this.userInfoType.cleUinf = true; //点击编辑
+                    // this.userInfoType.leUinf = false; //联系人信息显示修改
+                    // this.userInfoType.luinf = false; //个人显示 确认取消
+                    // this.userInfoType.cdeUinf = true; //点击编辑
+                    // this.userInfoType.deUinf = false; //联系人信息显示修改
+                    // this.userInfoType.duinf = false; //个人显示 确认取消 
+                    // this.userInfoType.type = false; //修改按钮的显示 
+            },
+            getDelivery(){ //获取 面签员
+                let params = {}; 
+                params = {
+                    pageSize: 100,
+                    pageNum: 1,
+                    //role:''
+                };
+                this.infoLoading = true;
+                this.deliveryForm.mid = '';
+                this.$http.ajaxPost({
+                    url: 'admin/queryAdminList',
+                    params: params
+                }, (res) => {
+                    this.$http.aop(res, () => { 
+                        this.deliveryList = res.body.data.adminList; 
+                        for (var i = 0 ; i<this.deliveryList.length;  i++) {
+                            this.deliveryList[i].mid = this.deliveryList[i].mid+'';
+                        } 
+                        this.deliveryFormVisible = true;
+                        this.infoLoading = false;
+                    });
+                }); 
             },
             createDelivery() { //指派面签员
                 this.$refs.deliveryForm.validate((valid) => {
@@ -664,8 +1052,7 @@ export default {
                         this.$confirm('是否确认', '提示', {}).then(() => {
                             let para = Object.assign({}, this.deliveryForm);
                             para.orderId = this.orderInfo.orderId;
-                            para.name = this.deliveryName(para.mid);
-                            console.log(para.name);
+                            para.name = this.deliveryName(para.mid); 
                             this.$http.ajaxPost({
                                 url: 'order/createDelivery',
                                 params: para
@@ -682,12 +1069,46 @@ export default {
                             });
                             this.deliveryFormVisible = false;
 
-                        });
+                        }).catch(() => {
+                            this.$message({
+                                type: 'info',
+                                message: '已取消开启'
+                            });
+                        });       
                     }
-                })
+                });
+            },
+            isOKSubmit() { //确认订单信息
+                this.$confirm('是否确认，当前用户信息？', '提示', {}).then(() => {
+                    let para = Object.assign({}, this.descForm);
+                    para.orderId = this.orderInfo.orderId;
+                    this.$http.ajaxPost({
+                        url: 'order/confirmOrder',
+                        params: para
+                    }, (res) => {
+                        this.$http.aop(res, () => {
+                            this.$message({
+                                message: '修改成功',
+                                type: 'success'
+                            });
+                            this.getDataList();
+                        })
+                    });
+                    this.descFormVisible = false;
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消修改'
+                    });
+                });       
             },
             chongzuSubmit() { //回到重组状态
-                this.$confirm('是否确认，当前用户账单回到重组状态？', '提示', {}).then(() => {});
+                this.$confirm('是否确认，当前用户账单回到重组状态？', '提示', {}).then(() => {}).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消回到重组'
+                    });
+                });       
             },
             remarkOrder(str, type) { //状态操作按钮
                 this.descTitle = str;
@@ -713,7 +1134,12 @@ export default {
                         });
                     });
                     this.descFormVisible = false;
-                });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取开启'
+                    });
+                });       
             },
             closeOrderSubmit() { //关闭订单
                 this.$confirm('是否确认，关闭当前账单？', '提示', {}).then(() => {
@@ -733,27 +1159,13 @@ export default {
                         })
                     });
                     this.descFormVisible = false;
-                });
-            },
-            isOKSubmit() { //确认 信息
-                this.$confirm('是否确认，当前用户信息？', '提示', {}).then(() => {
-                    let para = Object.assign({}, this.descForm);
-                    para.orderId = this.orderInfo.orderId;
-                    this.$http.ajaxPost({
-                        url: 'order/confirmOrder',
-                        params: para
-                    }, (res) => {
-                        this.$http.aop(res, () => {
-                            this.$message({
-                                message: '修改成功',
-                                type: 'success'
-                            });
-                            this.getDataList();
-                        })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
                     });
-                    this.descFormVisible = false;
-                });
-            },
+                });       
+            }, 
             overSubmit() { //代偿完成
                 this.$confirm('是否确认，当前用户账单代偿完成？', '提示', {}).then(() => {
                     let para = Object.assign({}, this.descForm);
@@ -772,6 +1184,39 @@ export default {
                     });
                     this.descFormVisible = false;
 
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });       
+            },
+            chengeOrderInfo(){//修改账单信息  
+                this.$refs.descForm.validate((valid) => {
+                    if (valid) {
+                        this.$confirm('是否确认，要修改订单信息？', '提示', {}).then(() => {
+                            let para = Object.assign({}, this.descForm);
+                            para.orderId = this.orderInfo.orderId;
+                            this.$http.ajaxPost({
+                                url: 'order/modifyOrder',
+                                params: para
+                            }, (res) => {
+                                this.$http.aop(res, () => {
+                                    this.$message({
+                                        message: '修改订单',
+                                        type: 'success'
+                                    }); 
+                                    this.getDataList();
+                                })
+                            });
+                            this.descFormVisible = false;
+                        }).catch(() => {
+                            this.$message({
+                                type: 'info',
+                                message: '已取修改订单'
+                            });
+                        });       
+                    }
                 });
             },
             updateOrder() { // 更新账单
@@ -791,7 +1236,12 @@ export default {
                         })
                     });
                     this.descFormVisible = false;
-                });
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消更新账单'
+                    });
+                });       
             },
             remarkOrderSubmit(type) { //填写备注  
                 switch (type) {
@@ -810,11 +1260,360 @@ export default {
                     case 'updateOrder':
                         this.updateOrder();
                         return;
+                    case 'chengeOrderInfo': 
+                        this.chengeOrderInfo();
 
                     default:
                         return;
                 }
-            }
+            },
+            viewRepayPlan(type){//查看/修改重组明细
+                var para = {};
+                this.infoLoading = true;
+                para.orderId = this.orderInfo.orderId;
+                this.$http.ajaxPost({
+                    url: 'repay/queryRepayPlan',
+                    params: para
+                }, (res) => {
+                    this.$http.aop(res, () => { 
+                        this.repayPlanList = JSON.parse(res.body.data.repayPlan.repayInfo);
+                        if(type=="modify"){//修改
+                            this.repayPlanId = res.body.data.repayPlan.repayPlanId;
+                            this.repayPlanFormVisible = true; 
+                        } else{//查看
+                            this.repayPLanViewVisible = true; 
+                        } 
+                        this.infoLoading = false;
+                    })
+                });
+            },
+            addOneRepayPlan(){//添加一条 重组明细数据
+                var item = {
+                    capital:'',
+                    monFee :'',
+                    repayDate : "",
+                    repayIndex :'',
+                }
+                this.repayPlanList.push(item);
+            },
+            deleteOneRayPlan(tag){//删除一条重组明细数据
+                this.repayPlanList.splice(this.repayPlanList.indexOf(tag), 1);
+            },
+            severRepayPlanSubmit(){
+                this.$confirm('是否确认，当前修改重组明细？', '提示', {}).then(() => {
+                    var repayInfoList = [];
+                    for(let i = 0; i < this.repayPlanList.length; i++){
+                        this.repayPlanList[i].repayIndex = i+1;
+                         
+                        repayInfoList.push(this.repayPlanList[i]);
+                    } 
+                    console.log(repayInfoList);
+                    //return ;
+                    let para = {
+                        repayInfo: JSON.stringify(repayInfoList),
+                        orderId:this.orderInfo.orderId,
+                        fqNum:repayInfoList.length,
+                        repayPlanId:this.repayPlanId
+                    };  
+                    this.$http.ajaxPost({
+                        url: 'repay/modifyRepayPlan',
+                        params: para
+                    }, (res) => {
+                        this.$http.aop(res, () => {
+                            this.$message({
+                                message: '修改成功',
+                                type: 'success'
+                            });
+                            this.getDataList();
+                        })
+                    });
+                    this.repayPlanFormVisible = false;
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消修改'
+                    });
+                });       
+            },
+            viewRepayInfo(type){//查看还款明细
+                var para = {};
+                this.infoLoading = true;
+                para.orderId = this.orderInfo.orderId;
+                this.$http.ajaxPost({
+                    url: 'repay/queryRepayInfo',
+                    params: para
+                }, (res) => {
+                    this.$http.aop(res, () => { 
+                        this.repayInfoList = res.body.data.repayInfoList;
+                        if(type=="modify"){//修改
+                            this.repayInfoFormVisible = true;
+                        } else{//查看
+                            this.repayInfoViewVisible = true; 
+                        } 
+                        this.infoLoading = false;
+                    })
+                });
+            }, 
+            severRepayInSubmit(){//修改还款明细  确认
+                this.$confirm('是否确认，当前修改还款明细？', '提示', {}).then(() => {
+                    let para = {
+                        repayInfoList:this.repayInfoList,
+                        orderId:this.orderInfo.orderId
+                    };  
+                    this.$http.ajaxPost({
+                        url: 'repay/modifyRepayInfo',
+                        params: para
+                    }, (res) => {
+                        this.$http.aop(res, () => {
+                            this.$message({
+                                message: '修改成功',
+                                type: 'success'
+                            });
+                            this.getDataList();
+                        })
+                    });
+                    this.repayInfoFormVisible = false;
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消修改'
+                    });
+                });       
+            },
+            delDebt(id){// 删除账单
+                this.$confirm('确认删除该记录吗?', '提示', {
+                    type: 'warning'
+                }).then(() => {
+                    let para = {
+                        orderDebtId: id
+                    };
+                    this.$http.ajaxPost({
+                        url: 'debt/deleteOrderDebt',
+                        params: para
+                    }, (res) => {
+                        this.$http.aop(res, () => {
+                            this.$message({
+                                message: '删除成功',
+                                type: 'success'
+                            });
+                            this.getDataList();
+                        });
+                    });
+
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+            modifyDebt(val,type,obj){// 增加／修改账单按钮 初始化上传空间 
+                this.$http.get('upload/getAliyunPostPolicy', {}, {
+                    emulateJSON: false
+                }).then((res) => { 
+                    this.$http.aop(res, () => {
+                        this.uploadPolicy = res.body.data || {}; 
+                        this.uploadConfig.data.policy = this.uploadPolicy.policy;
+                        this.uploadConfig.data.OSSAccessKeyId = this.uploadPolicy.accessid;
+                        this.uploadConfig.data.signature = this.uploadPolicy.signature;  
+                        if(this.typeofFun(obj)){   
+                            if(obj.picUrlList){ 
+                                for (var i = 0; i < obj.picUrlList.length; i++) {
+                                    this.picUrlList.push({
+                                        name: i + '.png',
+                                        url: obj.picUrlList[i]
+                                    });
+                                }
+                            } 
+                            this.fileList = this.picUrlList; 
+                            this.debtForm = {
+                                orderDebtId:obj.orderDebtId,
+                                platform:obj.platform,
+                                amount:obj.amount+'',
+                                overdueDays:obj.overdueDays+'',
+                                overdueStatus:obj.overdueStatus+'',
+                                picUrlList:obj.picUrlList,
+                                state:obj.state
+                            }; 
+                        }else{
+                            this.debtForm = {
+                                platform:'',
+                                amount:'',
+                                overdueDays:'',
+                                overdueStatus:'',
+                                picUrlList:[], 
+                            };
+                        } 
+                        this.debtTitle = val;
+                        this.debtFormType = type;
+                        this.debtFormVisible =true; 
+                    });
+                }, (res) => {
+                    this.$http.aop(res);
+                });
+            },
+            AddDebtSubmit(type){ //保存账单 
+                if(type=='create' ){
+                    this.createOrderDebt(); 
+                }else{
+                    this.modifyOrderDebt();  
+                }
+            },
+            createOrderDebt(){//添加账单
+                this.$refs.debtForm.validate((valid) => {
+                    if (valid) {
+                        
+                        if(this.picUrlList.length<1){
+                            this.$message({
+                                message: '请天添加图片',
+                                 type: 'info',
+                            });
+                            return;
+                        } 
+                        this.$confirm('是否确认，添加当前账单？', '提示', { 
+                        }).then(() => {
+                            var debt = Object.assign({}, this.debtForm);
+                            for (var i = 0; i < this.picUrlList.length; i++) {
+                                var imgUrl = this.picUrlList[i].url; 
+                                 debt.picUrlList.push(imgUrl);
+                            } 
+                            
+                            let para = { 
+                                debt:debt, 
+                                orderId:this.orderInfo.orderId
+                            };  
+                            this.$http.ajaxPost({
+                                url: 'debt/createOrderDebt',
+                                params: para
+                            }, (res) => {
+                                this.$http.aop(res, () => {
+                                    this.$message({
+                                        message: '添加成功',
+                                        type: 'success'
+                                    });
+                                    this.getDataList();
+                                })
+                            });
+                            this.debtFormVisible = false;
+                        }).catch(() => {
+                            this.$message({
+                                type: 'info',
+                                message: '已取消'
+                            });
+                        });       
+                    }
+                }); 
+            },
+            modifyOrderDebt(){//编辑账单 
+                this.$refs.debtForm.validate((valid) => {
+                    if (valid) {
+                        this.$confirm('是否确认，添加当前账单？', '提示', { 
+                        }).then(() => { 
+                            var debt = Object.assign({}, this.debtForm);
+                            var user = JSON.parse(sessionStorage.getItem('user'));
+                            debt.picUrlList = []; 
+                            for (var i = 0; i < this.picUrlList.length; i++) {
+                                var imgUrl = this.picUrlList[i].url; 
+                                debt.picUrlList.push(imgUrl);
+                            } 
+                            console.log(debt);
+                            let para = { 
+                                debt:debt, 
+                                orderId:this.orderInfo.orderId
+                            }; 
+                            this.$http.ajaxPost({
+                                url: 'debt/modifyOrderDebt',
+                                params: para
+                            }, (res) => {
+                                this.$http.aop(res, () => {
+                                    this.$message({
+                                        message: '修改成功',
+                                        type: 'success'
+                                    });
+                                    this.getDataList();
+                                })
+                            });
+                            this.debtFormVisible = false;
+                        }).catch(() => { 
+                            this.$message({
+                                type: 'info',
+                                message: '已取消'
+                            });
+                        });       
+                    }
+                }); 
+            },
+            changeOrderDebtState(item){ //修改账单状态
+                this.$confirm('是否确认，修改当前债务状态？', '提示', { 
+                }).then(() => { 
+                    let para = {
+                        orderDebtId:item.orderDebtId, 
+                        state:item.state 
+                    };  
+                    this.$http.ajaxPost({
+                        url: 'debt/modifyDebtState',
+                        params: para
+                    }, (res) => {
+                        this.$http.aop(res, () => { 
+                            this.$message({
+                                message: '修改成功',
+                                type: 'success'
+                            });
+                            this.getDataList();
+                        })
+                    });
+                    this.debtFormVisible = false;
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消修改'
+                    });
+                }); 
+            },
+            closeDebtDialog(){
+                this.fileList = []; 
+                this.picUrlList = []; 
+                this.$refs.upload.clearFiles(); 
+            },
+            viewImg(aImg){//查看图片
+                this.debtImgBox = aImg;
+                this.dialogImgVisible = true; 
+            },
+            uploadSuccess(response,file,fileList){//文件长传成功  
+                this.picUrlList.push({
+                    name:file.name,
+                    url:this.uploadPolicy.host +'/'+this.uploadConfig.data.key
+                });  
+            }, 
+            beforeUpload(file){
+                let key = this.uploadPolicy.dir + '/' + md5('' + Date.now + this.uploadPolicy.uid + Math.random()); 
+                this.uploadConfig.data.key = key; 
+                const isFileLength = this.picUrlList.length <= 4;
+                if(!isFileLength){
+                    this.$message({
+                        type: 'info',
+                        message: '最多只添加五张图片'
+                    });
+                    
+                }
+                return isFileLength; 
+            },
+            uploadRemove(file,fileList){ 
+                if(this.picUrlList.length<5){
+                    for (var i = 0; i < this.picUrlList.length; i++) {
+                        if(this.picUrlList[i].name ==file.name){
+                            this.picUrlList.splice(i,1);
+                            break;
+                        }
+                    } 
+                }
+            },
+            uploadError(file,fileList){
+                this.$message({
+                    type: 'info',
+                    message: '文件上传失败'
+                }); 
+            } 
         },
         mounted() {
             this.orderInfo.orderId = this.$route.params.id;

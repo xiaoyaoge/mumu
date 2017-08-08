@@ -9711,3 +9711,13 @@ button.king-btn.bk-block {
 .el-radio-button__inner:hover {
     background-color: #f1f1f1;
 }
+.el-upload__input {
+    display: none!important;
+}
+.el-upload-list--picture-card .el-upload-list__item,.el-upload--picture-card{
+    width: 60px;
+    height: 60px; 
+}
+.el-upload--picture-card{
+    line-height: 70px;
+}

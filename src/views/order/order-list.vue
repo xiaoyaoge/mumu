@@ -212,7 +212,7 @@ export default {
                     case 333:
                         return '用户确认同意, 这一步等待替用户还款';
                     case 360:
-                        return '我方代偿完成, 并生成账单';
+                        return '用户还款中';
                     case 430:
                         return '还款完成(全部期数还完)';
                     default:

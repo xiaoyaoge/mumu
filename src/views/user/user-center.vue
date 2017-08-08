@@ -264,8 +264,7 @@ export default {
                                     this.pageNum = 1;
                                     this.getDataList();
                                 })
-                            });
-
+                            }); 
                             this.editFormVisible = false;
                         });
                     }

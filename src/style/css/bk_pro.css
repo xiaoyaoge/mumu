@@ -1876,7 +1876,7 @@ th {
 .bk-table>tbody>tr>th,
 .bk-table>tbody>tr>td {
     line-height: 20px;
-    padding: 10px 20px;
+    padding: 10px 10px;
     vertical-align: top;
     border-top: 1px solid #e6e6e6
 }
