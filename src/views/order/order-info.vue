@@ -60,23 +60,22 @@
                             <div class="bk-form-item">
                                 <label class="bk-label ta-l" style="width:120px;">姓名：</label>
                                 <div class="bk-form-content" style="margin-left:120px;">
-                                    <input type="text" class="bk-form-input" v-model="userForm.name" placeholder="" :readonly="userInfoType.ceUinf">
+                                    <input type="text" class="bk-form-input" v-model="userForm.name" maxlength="10" placeholder="" :readonly="userInfoType.ceUinf">
                                 </div>
                             </div>
                             <div class="bk-form-item mt5">
                                 <label class="bk-label ta-l" style="width:120px;">身份证号：</label>
                                 <div class="bk-form-content" style="margin-left:120px;">
-                                    <input type="text" class="bk-form-input" v-model="userForm.idCard" placeholder="" :readonly="userInfoType.ceUinf">
+                                    <input type="text" class="bk-form-input" v-model="userForm.idCard" maxlength="18" placeholder="" :readonly="userInfoType.ceUinf">
                                 </div>
                             </div>
                             <div class="bk-form-item mt5">
                                 <label class="bk-label ta-l" style="width:120px;">学历：</label>
                                 <div class="bk-form-content" style="margin-left:120px;">
-                                    <el-select v-model="userForm.userDegree" :class="userInfoType.ceUinf?'none':''">
+                                    <el-select v-model.number="userForm.degree" :class="userInfoType.ceUinf?'none':''">
                                         <el-option v-for="item in degreeBox" :label="item.name" :value="item.id"></el-option> 
-                                    </el-select>
-                                    <!-- <input type="text" class="bk-form-input" v-model="orderInfo.degree" placeholder="" value="本科" :class="userInfoType.ceUinf?'none':''"> -->
-                                    <span :class="userInfoType.ceUinf?'':'none'" style=" float: left; width:100%; color: #666;text-align:right">{{degreeType(userForm.userDegree)}}</span>
+                                    </el-select> 
+                                    <span :class="userInfoType.ceUinf?'':'none'" style=" float: left; width:100%; color: #666;text-align:right">{{degreeType(userForm.degree)}}</span>
                                 </div>
                             </div>
                             </form>
@@ -93,7 +92,7 @@
                         <h4>联系人信息</h4>
                         <a class="bk-text-button bk-primary edit-btn" :class="userInfoType.leUinf?'':'none'" title="修改" @click="changeContact">修改</a>
                         <a class="bk-text-button bk-primary cancel-btn" :class="userInfoType.luinf?'':'none'" title="取消" @click="notChangContact">取消</a>
-                        <a class="bk-text-button bk-primary affirm-btn" :class="userInfoType.luinf?'':'none'" title="确认" @click="isOkContact">确认</a>
+                        <a v-show="userContact.length>0" class="bk-text-button bk-primary affirm-btn" :class="userInfoType.luinf?'':'none'" title="确认" @click="isOkContact">确认</a>
                         <a class="bk-text-button bk-primary add-btn" :class="userInfoType.luinf?'':'none'" title="添加" @click="addContact">添加</a>
                     </div>
                     <div class="label-cont mt15" :class="userContact.length>0?'':'none'">
@@ -107,7 +106,7 @@
                                 </div> 
                                 <div  class="bk-form-item mt5 mb15"> 
                                     <label class="bk-label ta-l" style="width:120px; padding-top:0;padding-bottom:0; padding-right: 20px;  ">
-                                        <input type="text" class="bk-form-input" style="width:80px;" placeholder="输入关系" v-model="item.relation" :readonly="userInfoType.cleUinf">：</label>
+                                        <input type="text" class="bk-form-input" style="width:80px;" maxlength="10" placeholder="输入关系" v-model="item.relation" :readonly="userInfoType.cleUinf">：</label>
                                     <div class="bk-form-content" style="margin-left:120px;"> 
                                         <input type="text" class="bk-form-input" placeholder="输入如：李四／13700000000" v-model="item.value" :readonly="userInfoType.cleUinf"> 
                                     </div> 
@@ -126,7 +125,7 @@
                         <h4>担保人信息</h4>
                         <a class="bk-text-button bk-primary edit-btn" :class="userInfoType.deUinf?'':'none'" title="修改" @click="changeGuarantor">修改</a>
                         <a class="bk-text-button bk-primary cancel-btn" :class="userInfoType.duinf?'':'none'" title="取消" @click="notChangGuarantor">取消</a>
-                        <a class="bk-text-button bk-primary affirm-btn" :class="userInfoType.duinf?'':'none'" title="确认" @click="isOkGuarantor">确认</a>
+                        <a v-show="userGuarantor.length>0" class="bk-text-button bk-primary affirm-btn" :class="userInfoType.duinf?'':'none'" title="确认" @click="isOkGuarantor">确认</a>
                         <a class="bk-text-button bk-primary add-btn" :class="userInfoType.duinf?'':'none'" title="添加" @click="addGuarantor">添加</a>
                     </div>
                     <div v-if="userGuarantor.length>0" class="label-cont mt15">
@@ -141,13 +140,13 @@
                                 <div class="bk-form-item mt5 clearfix">
                                     <label class="bk-label ta-l" style="width:150px;">姓名：</label>
                                     <div class="bk-form-content" style="margin-left:150px;">
-                                        <input type="text" class="bk-form-input" v-model="item.name" placeholder="" :readonly="userInfoType.cdeUinf">
+                                        <input type="text" class="bk-form-input" v-model="item.name" maxlength="10" placeholder="" :readonly="userInfoType.cdeUinf">
                                     </div>
                                 </div>
                                 <div class="bk-form-item mt5">
                                     <label class="bk-label ta-l" style="width:150px;">身份证号：</label>
                                     <div class="bk-form-content" style="margin-left:150px;">
-                                        <input type="text" class="bk-form-input" v-model="item.idCard" placeholder="" :readonly="userInfoType.cdeUinf">
+                                        <input type="text" class="bk-form-input" v-model="item.idCard" maxlength="18"  placeholder="" :readonly="userInfoType.cdeUinf">
                                     </div>
                                 </div>
                                 <div class="bk-form-item mt5 clearfix">
@@ -156,15 +155,14 @@
                                         <el-select v-model="item.pawns" :class="userInfoType.cdeUinf?'none':''">
                                             <el-option v-for="item in pawnsBox" :label="item.name" :value="item.id"></el-option> 
                                         </el-select> 
-                                        <span :class="userInfoType.cdeUinf?'':'none'" style=" float: left; width:100%; color: #666;text-align:right">{{pawnsType(item.pawns)}}</span>
-                                   
+                                        <span :class="userInfoType.cdeUinf?'':'none'" style=" float: left; width:100%; color: #666;text-align:right">{{pawnsType(item.pawns)}}</span> 
                                         <!-- <input type="text" class="bk-form-input" v-model="item.pawns" placeholder="" :readonly="userInfoType.cdeUinf"> -->
                                     </div>
                                 </div>
                             </div>
                         </form>
                     </div>
-                    <div v-else class="nodata-cont">无联系人细信息</div>
+                    <div v-else class="nodata-cont">无联担保人细信息</div>
                 </div>
             </div>
         </div>
@@ -197,7 +195,7 @@
                         <tr v-for="(item,index) in debtList">
                             <td>{{item.platform}}</td>
                             <td class="text-r">{{item.amount}}</td>
-                            <td>{{item.overdueStatus}}</td>
+                            <td>{{item.overdueStatus==2?'逾期':'未逾期'}}</td>
                             <td>{{item.overdueDays}}</td>
                             <td>
                                 <a v-if="item.picUrlList" class="bk-text-button" @click="viewImg(item.picUrlList)">查看图片</a>
@@ -207,7 +205,7 @@
                             <td>
                                 <a v-if="!typeofFun(repayInfo)&&orderInfo.orderState==310" class="bk-text-button" @click="modifyDebt('编辑账单','modify',item)">编辑</a>
                                 <a v-if="!typeofFun(repayInfo)&&orderInfo.orderState==310" class="bk-text-button" @click="delDebt(item.orderDebtId)">删除</a>
-                                <select v-if="!typeofFun(repayInfo)&&orderInfo.orderState==310" v-model="item.state" @change="changeOrderDebtState(item)"  class="select">
+                                <select v-if="!typeofFun(repayInfo)&&orderInfo.orderState==333" v-model="item.state" @change="changeOrderDebtState(item)"  class="select">
                                     <option value="0">未代偿</option> 
                                     <option value="1">已代偿</option>
                                 </select>
@@ -226,14 +224,15 @@
                 </table>
             </div>
         </div>
-        <div v-if="typeofFun(repayPlan)" class="bk-panel mt20">
+        <div class="bk-panel mt20">
             <div class="bk-panel-header" role="tab">
                 <div class="bk-panel-info fl">
                     <div  class="panel-title">重组明细</div>
                 </div>
                 <div class="bk-panel-action fr">
                     <div v-if="userInfoType.payPlanInfo" class="bk-form bk-inline-form bk-form-small">
-                        <button v-if="!typeofFun(repayInfo)" class="bk-button bk-primary bk-button-small" @click="viewRepayPlan('modify')" title="修改">修改</button>
+                        <button v-if="!typeofFun(repayInfo)&&typeofFun(repayPlan)" class="bk-button bk-primary bk-button-small" @click="viewRepayPlan('modify')" title="修改">修改</button>
+                        <button v-if="!typeofFun(repayInfo)&&!typeofFun(repayPlan)" class="bk-button bk-primary bk-button-small" @click="viewRepayPlan('create')" title="修改">增加</button>
                     </div>
                 </div>
             </div>
@@ -257,7 +256,7 @@
                             <td>{{repayPlan.overDueDays}}</td>
                             <td>{{repayPlan.repayType}}</td>
                             <td>
-                                <a class="bk-text-button" @click="viewRepayPlan('view')">查看详情</a>
+                                <a v-show="typeofFun(repayPlan)"  class="bk-text-button" @click="viewRepayPlan('view')">查看详情</a>
                             </td>
                         </tr> 
                     </tbody>
@@ -320,8 +319,8 @@
                         <tr v-for="(item,index) in logList">
                             <td>{{item.createTime}}</td>
                             <td>{{item.name}}</td>
-                            <td>{{item.remark}}</td>
                             <td>{{item.description}}</td>
+                            <td>{{item.remark}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -418,18 +417,34 @@
         </el-dialog>
         <!-- 添加～修改账单-->
         <el-dialog :title="debtTitle" v-model="debtFormVisible" :close-on-click-modal="false" @close="closeDebtDialog">
-            <el-form :model="debtForm" label-width="100px" :rules="debtFormRules" ref="debtForm">
-                <el-form-item label="债务平台" prop="platform">
+            <el-form :model="debtForm" label-width="100px" ref="debtForm">
+                <el-form-item label="债务平台" 
+                    prop="platform"
+                    :rules="[{ required: true, message: '请输入平台名称', trigger: 'blur'} ]"
+                >
                     <el-input v-model="debtForm.platform" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="代还款金额" prop="amount">
-                    <el-input v-model="debtForm.amount" auto-complete="off"></el-input>
+                <el-form-item label="代还款金额" 
+                    prop="amount"
+                    :rules="[
+                        { required: true, message: '请输入代还款金额'},
+                        { type: 'number', message: '代还款金额必须为数字值',trigger: 'blur,change'}
+                    ]"
+                >
+                    <el-input v-model.number="debtForm.amount" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="逾期天数" prop="overdueDays">
-                    <el-input v-model="debtForm.overdueDays" auto-complete="off"></el-input>
+                <el-form-item label="逾期天数" 
+                    prop="overdueDays"
+                    :rules="[
+                      { type: 'number', message: '逾期天数必须为数字值', trigger: 'blur,change'}
+                    ]"
+                >
+                    <el-input v-model.number="debtForm.overdueDays" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="逾期情况" prop="overdueStatus">
-                    <el-input v-model="debtForm.overdueStatus" auto-complete="off"></el-input>
+                <el-form-item label="逾期情况">
+                    <el-select v-model.number="debtForm.overdueStatus">
+                     <el-option v-for="item in overdueStatus" :label="item.name" :value="item.id"></el-option>
+                    </el-select> 
                 </el-form-item>
 
                 <el-form-item>
@@ -447,7 +462,7 @@
                         :before-upload="beforeUpload" 
                          >
                       <i class="el-icon-plus"></i>
-                      <div slot="tip" class="el-upload__tip">只能上传jpg/png/jpeg/webp/gif文件，且不超过500kb</div>
+                      <div slot="tip" class="el-upload__tip">只能上传jpg/png/jpeg/webp/gif文件，且不超过5mb</div>
                     </el-upload> 
                 </el-form-item> 
             </el-form>
@@ -555,7 +570,7 @@
 <script>
 import moment from 'moment';
 import md5 from 'js-md5'; 
-// import FileUpload from '../../common/FileUpload/FileUpload.vue';
+import validate from '../../validate';
 export default {
     data() {
             return { 
@@ -569,47 +584,29 @@ export default {
                 debtImgBox:[], 
                 debtForm:{
                     platform:'',
-                    amount:'',
-                    overdueDays:'',
-                    overdueStatus:'',
+                    amount:0,
+                    overdueDays:0,
+                    overdueStatus:'', 
                     picUrlList:[], 
                 },
-                debtFormRules: {
-                    platform: [{
-                        required: true,
-                        message: '请输入平台',
-                        trigger: 'blur'
-                    }],
-                    amount: [{
-                        required: true,
-                        message: '请输入金额',
-                        trigger: 'blur'
-                    }],
-                    overdueDays: [{
-                        required: true,
-                        message: '请输入逾期天数',
-                        trigger: 'blur'
-                    }],
-                    overdueStatus: [{
-                        required: true,
-                        message: '请输入逾期情况',
-                        trigger: 'blur'
-                    }]
-                },
-                pawnsBox:[
-                    {name:"房子",id:"1"},
-                    {name:"车子",id:"2"},
-                    {name:"保险",id:"3"},
-                    //{name:"其它",id:"4"}
+                overdueStatus:[
+                    {name:"未逾期",id:1},
+                    {name:"逾期",id:2}, 
                 ],
+                pawnsBox:[
+                    {name:"房子",id:'1'},
+                    {name:"车子",id:'2'},
+                    {name:"保险",id:'3'},
+                    //{name:"其它",id:"4"}
+                ], 
                 degreeBox:[
-                    {name:"高中及以下",id:"1"},
-                    {name:"中专",id:"2"},
-                    {name:"大专",id:"3"},
-                    {name:"本科",id:"4"},
-                    {name:"硕士",id:"5"},
-                    {name:"博士",id:"6"},
-                    {name:"其他",id:"7"}],
+                    {name:"高中及以下",id:1},
+                    {name:"中专",id:2},
+                    {name:"大专",id:3},
+                    {name:"本科",id:4},
+                    {name:"硕士",id:5},
+                    {name:"博士",id:6},
+                    {name:"其他",id:7}],
                 userInfoType: {
                     ceUinf: true, //点击编辑
                     eUinf: false, //个人信息显示修改
@@ -630,21 +627,8 @@ export default {
                     orderId: '',
                     name: '',
                     idCard: '',
-                    degree: '',
-                    userDegree: '',
-                },
-                userFormRules: {
-                    name: [{
-                        required: true,
-                        message: '请选择面签员',
-                        trigger: 'blur'
-                    }],
-                    idCard: [{
-                        required: true,
-                        message: '请填写备注信息',
-                        trigger: 'blur'
-                    }]
-                },
+                    degree: '' 
+                }, 
                 deliveryList: [],
                 deliveryFormVisible: false,
                 deliveryForm: {
@@ -706,10 +690,7 @@ export default {
                 count: 0,
             }
         },
-        methods: { 
-            handleRemove(file) {
-                console.log(file);
-            },
+        methods: {  
             getPageName(url) { //获取文件名 
                 var tmp = new Array(); 
                 tmp = url.split("/"); 
@@ -727,6 +708,7 @@ export default {
                 }
             },
             countFun() { //账单总金额
+                this.count = 0;
                 for (let i = 0; i < this.debtList.length; i++) {
                     this.count += this.debtList[i].amount;
                 }
@@ -794,7 +776,7 @@ export default {
                         this.logList = res.body.data.logList;
                         this.debtList = res.body.data.debtList;
                         this.userForm.orderId = this.orderInfo.orderId;
-                        this.userForm.userDegree = this.orderInfo.degree + '';
+                        this.userForm.degree = this.orderInfo.degree;
                         this.userForm.idCard = this.orderInfo.idCard;
                         this.userForm.name = this.orderInfo.name;
                         this.countFun()
@@ -827,7 +809,7 @@ export default {
                     gid: '',
                     idCard: '',
                     name: '',
-                    pawns: '',
+                    pawns: 1
                 };
                 this.userGuarantor.push(guarantor);
             },
@@ -860,113 +842,196 @@ export default {
                     this.$http.aop(res, () => {
                         this.userContact = res.body.data.contactList || [];
                         for (let i = 0; i < this.userContact.length; i++) {
-                            this.userContact[i].value = this.userContact[i].name + '／' + this.userContact[i].mobile;
+                            this.userContact[i].value = this.userContact[i].name + '/' + this.userContact[i].mobile;
                         }
                     });
                 }); 
             }, 
-            isOkChangUser() { // 确认修个人信息
-                this.$confirm('是否确认，修改当前用户信息？', '提示', {}).then(() => {
-                    let para = Object.assign({}, this.userForm);
-                    para.degree = para.userDegree;
-                    delete(para['userDegree']);
-                    this.$http.ajaxPost({
-                        url: 'order/modifyUser',
-                        params: para
-                    }, (res) => {
-                        this.$http.aop(res, () => {
-                            this.$message({
-                                message: '修改成功',
-                                type: 'success'
-                            });
-                            this.pageNum = 1;
-                            this.getDataList();
-                            this.notChangUser();
-                        })
-                    });
-
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
-                    });
-                });       
+            checkUserForm(){//验证个人信息
+                if(!validate.checkUserName(this.userForm.name)){
+                    this.$message.error('姓名格式不正确'); 
+                    return false;
+                }
+                if(!validate.checkID(this.userForm.idCard)){
+                    this.$message.error('身份证格式不正确'); 
+                    return false;
+                }
+                return true;  
             },
-            isOkContact() {//保存联系人
+            isOkChangUser() { // 确认修个人信息 
+                if(this.checkUserForm()){
+                    this.$confirm('是否确认，修改当前用户信息？', '提示', {}).then(() => {
+                        let para = Object.assign({}, this.userForm); 
+                        this.$http.ajaxPost({
+                            url: 'order/modifyUser',
+                            params: para
+                        }, (res) => {
+                            this.$http.aop(res, () => {
+                                this.$message({
+                                    message: '修改成功',
+                                    type: 'success'
+                                });
+                                this.pageNum = 1;
+                                this.getDataList();
+                                this.notChangUser();
+                            })
+                        }); 
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消修改'
+                        });
+                    });
+                } 
+            },
+            checkContact(data){//验证联系人 
+                let isOk = true;
+                let text = ''; 
+                console.log(data) 
+                data.forEach((item) => {
+                    Object.keys(item).forEach((val) => { 
+                        switch(val) { 
+                            case 'name':
+                                if(item[val] === '') {
+                                    text = '姓名不能为空';
+                                    isOk = false;
+                                }
+                                break;
+                            case 'mobile':
+                                if(!validate.checkPhoneNum(item[val])) {
+                                    text = '手机号格式不正确';
+                                    isOk = false;
+                                }
+                                break;
+                            case 'relation': 
+                                if(item[val] === '') {
+                                    text = '请填写联系人的关系';
+                                    isOk = false;
+                                } 
+                                break;
+                        }
+                    });
+                }); 
+                if(!isOk){
+                    this.$message.error(text); 
+                    return false;
+                }
+                return true;
+            },
+            isOkContact() {//保存联系人 
                 var params = {
                     contactList: [],
                     uid: this.orderInfo.uid
-                };
-                for (let i = 0; i < this.userContact.length; i++) {
-                    let aVal = this.userContact[i].value.split('／');
-                    let val = {
-                        cid: this.userContact[i].cid,
+                }; 
+                this.userContact.forEach((item) => {
+                    var aVal = item.value.split('/');
+                    var val = {
+                        cid: item.cid,
                         name: aVal[0],
                         mobile: aVal[1],
-                        relation: this.userContact[i].relation 
-                    }
+                        relation: item.relation 
+                    };
                     params.contactList.push(val);  
-                }
-                this.$confirm('是否确认，修改联系人信息？', '提示', {}).then(() => {
-                    this.$http.ajaxPost({
-                        url: 'order/modifyContact',
-                        params: params
-                    }, (res) => {
-                        this.$http.aop(res, () => {
-                            this.$message({
-                                message: '修改成功',
-                                type: 'success'
-                            });
-                            this.pageNum = 1;
-                            this.getDataList();
-                            this.notChangContact(); 
-                        })
-                    });
+                });
 
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
+                console.log(params.contactList);
+
+                if(this.checkContact(params.contactList)){  
+                    this.$confirm('是否确认，修改联系人信息？', '提示', {}).then(() => {
+                        this.$http.ajaxPost({
+                            url: 'order/modifyContact',
+                            params: params
+                        }, (res) => {
+                            this.$http.aop(res, () => {
+                                this.$message({
+                                    message: '修改成功',
+                                    type: 'success'
+                                });
+                                this.pageNum = 1;
+                                this.getDataList();
+                                this.notChangContact(); 
+                            })
+                        });
+
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消修改'
+                        });
                     });
-                });       
-            },  
+                }       
+            }, 
+            checkGuarantor(data){//验证担保人信息
+                let isOk = true;
+                let text = '';  
+                data.forEach((item) => {
+                    Object.keys(item).forEach((val) => { 
+                        switch(val) { 
+                            case 'name':
+                                if(item[val] === '') {
+                                    text = '姓名不能为空';
+                                    isOk = false;
+                                }
+                                break;
+                            case 'idCard':
+                                if(!validate.checkID(item[val])) {
+                                    text = '身份证号格式不正确';
+                                    isOk = false;
+                                }
+                                break;
+                            case 'pawns': 
+                                if(item[val] === '') {
+                                    text = '请选抵押物';
+                                    isOk = false;
+                                } 
+                                break;
+                        }
+                    });
+                }); 
+                if(!isOk){
+                    this.$message.error(text); 
+                    return false;
+                }
+                return true;
+            },
             isOkGuarantor() {//保存担保人
                 var params = {
                     guarantorList: [],
                     uid: this.orderInfo.uid
-                };
-                for (let i = 0; i < this.userGuarantor.length; i++) { 
+                }; 
+                this.userGuarantor.forEach((item) => {  
                     let val = {
-                        gid: this.userGuarantor[i].gid || 0,
-                        name: this.userGuarantor[i].name,
-                        idCard: this.userGuarantor[i].idCard,
-                        pawns: this.userGuarantor[i].pawns
-                    }
+                        gid: item.gid || 0,
+                        name: item.name,
+                        idCard: item.idCard,
+                        pawns: item.pawns
+                    } 
                     params.guarantorList.push(val);
+                });
+                if(this.checkGuarantor(params.guarantorList)){
+                    this.$confirm('是否确认，修改担保信息？', '提示', {}).then(() => {
+                        this.$http.ajaxPost({
+                            url: 'order/modifyGuarantor',
+                            params: params
+                        }, (res) => {
+                            this.$http.aop(res, () => {
+                                this.$message({
+                                    message: '修改成功',
+                                    type: 'success'
+                                });
+                                this.pageNum = 1;
+                                this.getDataList();
+                                this.notChangGuarantor();
+                            })
+                        });
 
-                }
-                this.$confirm('是否确认，修改担保信息？', '提示', {}).then(() => {
-                    this.$http.ajaxPost({
-                        url: 'order/modifyGuarantor',
-                        params: params
-                    }, (res) => {
-                        this.$http.aop(res, () => {
-                            this.$message({
-                                message: '修改成功',
-                                type: 'success'
-                            });
-                            this.pageNum = 1;
-                            this.getDataList();
-                            this.notChangGuarantor();
-                        })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消修改'
+                        });
                     });
-
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
-                    });
-                });       
+                }       
             },
             notChangContact() { //取消修改联系人信息
                 this.gitUserContact();
@@ -984,7 +1049,7 @@ export default {
                 this.userInfoType.ceUinf = true;
                 this.userInfoType.eUinf = true;
                 this.userInfoType.uinf = false;
-                this.userForm.userDegree = this.orderInfo.degree + '';
+                this.userForm.userDegree = this.orderInfo.degree;
                 this.userForm.idCard = this.orderInfo.idCard;
                 this.userForm.name = this.orderInfo.name;
             },
@@ -1191,7 +1256,7 @@ export default {
                     });
                 });       
             },
-            chengeOrderInfo(){//修改账单信息  
+            chengeOrderInfo(){//修改定单信息  
                 this.$refs.descForm.validate((valid) => {
                     if (valid) {
                         this.$confirm('是否确认，要修改订单信息？', '提示', {}).then(() => {
@@ -1271,21 +1336,26 @@ export default {
                 var para = {};
                 this.infoLoading = true;
                 para.orderId = this.orderInfo.orderId;
-                this.$http.ajaxPost({
-                    url: 'repay/queryRepayPlan',
-                    params: para
-                }, (res) => {
-                    this.$http.aop(res, () => { 
-                        this.repayPlanList = JSON.parse(res.body.data.repayPlan.repayInfo);
-                        if(type=="modify"){//修改
-                            this.repayPlanId = res.body.data.repayPlan.repayPlanId;
-                            this.repayPlanFormVisible = true; 
-                        } else{//查看
-                            this.repayPLanViewVisible = true; 
-                        } 
-                        this.infoLoading = false;
-                    })
-                });
+                if(type=="create"){
+                    this.repayPlanFormVisible = true;
+                    this.infoLoading = false;
+                }else{
+                    this.$http.ajaxPost({
+                        url: 'repay/queryRepayPlan',
+                        params: para
+                    }, (res) => {
+                        this.$http.aop(res, () => { 
+                            this.repayPlanList = JSON.parse(res.body.data.repayPlan.repayInfo);
+                            if(type=="modify"){//修改
+                                this.repayPlanId = res.body.data.repayPlan.repayPlanId;
+                                this.repayPlanFormVisible = true; 
+                            } else{//查看
+                                this.repayPLanViewVisible = true; 
+                            } 
+                            this.infoLoading = false;
+                        })
+                    });
+                }
             },
             addOneRepayPlan(){//添加一条 重组明细数据
                 var item = {
@@ -1407,7 +1477,7 @@ export default {
                     });
                 });
             },
-            modifyDebt(val,type,obj){// 增加／修改账单按钮 初始化上传空间 
+            modifyDebt(val,type,obj){// 增加／修改债务按钮 初始化上传空间 
                 this.$http.get('upload/getAliyunPostPolicy', {}, {
                     emulateJSON: false
                 }).then((res) => { 
@@ -1429,18 +1499,18 @@ export default {
                             this.debtForm = {
                                 orderDebtId:obj.orderDebtId,
                                 platform:obj.platform,
-                                amount:obj.amount+'',
-                                overdueDays:obj.overdueDays+'',
-                                overdueStatus:obj.overdueStatus+'',
+                                amount:obj.amount,
+                                overdueDays:obj.overdueDays,
+                                overdueStatus:obj.overdueStatus,
                                 picUrlList:obj.picUrlList,
                                 state:obj.state
                             }; 
                         }else{
                             this.debtForm = {
                                 platform:'',
-                                amount:'',
-                                overdueDays:'',
-                                overdueStatus:'',
+                                amount:0,
+                                overdueDays:0,
+                                overdueStatus:1,
                                 picUrlList:[], 
                             };
                         } 
@@ -1459,7 +1529,7 @@ export default {
                     this.modifyOrderDebt();  
                 }
             },
-            createOrderDebt(){//添加账单
+            createOrderDebt(){//添加债务
                 this.$refs.debtForm.validate((valid) => {
                     if (valid) {
                         
@@ -1504,10 +1574,10 @@ export default {
                     }
                 }); 
             },
-            modifyOrderDebt(){//编辑账单 
+            modifyOrderDebt(){//编辑债务 
                 this.$refs.debtForm.validate((valid) => {
                     if (valid) {
-                        this.$confirm('是否确认，添加当前账单？', '提示', { 
+                        this.$confirm('是否确认，修改当前账单？', '提示', { 
                         }).then(() => { 
                             var debt = Object.assign({}, this.debtForm);
                             var user = JSON.parse(sessionStorage.getItem('user'));
@@ -1516,7 +1586,8 @@ export default {
                                 var imgUrl = this.picUrlList[i].url; 
                                 debt.picUrlList.push(imgUrl);
                             } 
-                            console.log(debt);
+
+                             
                             let para = { 
                                 debt:debt, 
                                 orderId:this.orderInfo.orderId
@@ -1543,7 +1614,7 @@ export default {
                     }
                 }); 
             },
-            changeOrderDebtState(item){ //修改账单状态
+            changeOrderDebtState(item){ //修改债务状态
                 this.$confirm('是否确认，修改当前债务状态？', '提示', { 
                 }).then(() => { 
                     let para = {
@@ -1588,15 +1659,16 @@ export default {
             beforeUpload(file){
                 let key = this.uploadPolicy.dir + '/' + md5('' + Date.now + this.uploadPolicy.uid + Math.random()); 
                 this.uploadConfig.data.key = key; 
+                const isLt5M = file.size / 1024 / 1024 < 5;
                 const isFileLength = this.picUrlList.length <= 4;
                 if(!isFileLength){
-                    this.$message({
-                        type: 'info',
-                        message: '最多只添加五张图片'
-                    });
-                    
+                    this.$message.error('最多只添加五张图片'); 
                 }
-                return isFileLength; 
+                if(!isLt5M){
+                    this.$message.error('上传图片大小不能超过 5MB!');
+                }
+
+                return isFileLength && isLt5M; 
             },
             uploadRemove(file,fileList){ 
                 if(this.picUrlList.length<5){

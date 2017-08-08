@@ -20,7 +20,7 @@
                                 <!-- <el-radio-button label="发起请求"></el-radio-button> -->
                                 <el-radio-button label="待指派面签员"></el-radio-button>
                                 <el-radio-button label="待审核并生成账单"></el-radio-button>
-                                <el-radio-button label="用户确认重组"></el-radio-button>
+                                <el-radio-button label="待用户确认重组"></el-radio-button>
                                 <el-radio-button label="我方代偿中"></el-radio-button>
                                 <el-radio-button label="用户还款中"></el-radio-button>
                                 <el-radio-button label="已还清"></el-radio-button>
@@ -226,8 +226,8 @@ export default {
                     case '用户未提交资料':
                         return 100;
                     case '待指派面签员':
-                        return 310;
-                    case '用户确认重组':
+                        return 300;
+                    case '待用户确认重组':
                         return 330;
                     case '待审核并生成账单':
                         return 333;
