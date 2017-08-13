@@ -19,7 +19,7 @@
                                 <el-radio-button label="全部"></el-radio-button>
                                 <!-- <el-radio-button label="发起请求"></el-radio-button> -->
                                 <el-radio-button label="待指派面签员"></el-radio-button>
-                                <el-radio-button label="待审核并生成账单"></el-radio-button>
+                                <el-radio-button label="待审核并进行重组"></el-radio-button>
                                 <el-radio-button label="待用户确认重组"></el-radio-button>
                                 <el-radio-button label="我方代偿中"></el-radio-button>
                                 <el-radio-button label="用户还款中"></el-radio-button>
@@ -205,12 +205,14 @@ export default {
                         return '关单';
                     case 100:
                         return '用户未提交资料';
+                    case 300:
+                        return '待指派面签员';
                     case 310:
-                        return '业务员接单, 待上门';
+                        return '待审核并进行重组';
                     case 330:
-                        return '待用户确认';
+                        return '待用户确认重组';
                     case 333:
-                        return '用户确认同意, 这一步等待替用户还款';
+                        return '我方代偿中';
                     case 360:
                         return '用户还款中';
                     case 430:
@@ -219,7 +221,7 @@ export default {
                         return '未知状态';
                 }
             },
-            queryOrderState(val) {
+            queryOrderState(val) { 
                 switch (val) {
                     case '关闭':
                         return 20;
@@ -227,11 +229,11 @@ export default {
                         return 100;
                     case '待指派面签员':
                         return 300;
+                    case '待审核并进行重组':
+                        return 310;
                     case '待用户确认重组':
                         return 330;
-                    case '待审核并生成账单':
-                        return 333;
-                    case '我方代偿中':
+                    case '我方代偿中': 
                         return 333;
                     case '用户还款中':
                         return 360;

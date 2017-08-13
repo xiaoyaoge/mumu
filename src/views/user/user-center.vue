@@ -50,13 +50,16 @@
         <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
             <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
                 <div style="width: 90%; margin: 0 auto;">
-                    <el-form-item label="姓名" prop="name">
+                    <el-form-item 
+                        label="姓名" 
+                        prop="name" 
+                    >
                         <el-input v-model="editForm.name" auto-complete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="手机号码" prop="mobile">
+                    <el-form-item  label="手机号码" prop="mobile"> 
                         <el-input v-model="editForm.mobile" auto-complete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="密码" prop="">
+                    <el-form-item label="密码" prop="password">
                         <el-input type="password" v-model="editForm.password" placeholder="............................" auto-complete="off"></el-input>
                     </el-form-item>
                     <el-form-item label="角色" prop="orderType" class="type-class">
@@ -126,11 +129,17 @@ export default {
                         required: true,
                         message: '请输入手机号',
                         trigger: 'blur'
+                    },{
+                        type: 'string', 
+                        pattern: /^\d{11}$/,
+                        message: '请输入正确的手机号码', 
+                        trigger: 'blur,change' 
                     }],
                     password: [{
-                        required: true,
-                        message: '请输入密码',
-                        trigger: 'blur'
+                        type: 'string', 
+                        pattern: /^\w{6,16}$/,
+                        message: '请输入6~16密码', 
+                        trigger: 'blur,change' 
                     }]
                 },
                 //编辑界面数据
@@ -152,11 +161,21 @@ export default {
                         required: true,
                         message: '请输入手机号',
                         trigger: 'blur'
+                    },{
+                        type: 'string', 
+                        pattern: /^\d{11}$/,
+                        message: '请输入正确的手机号码', 
+                        trigger: 'blur,change' 
                     }],
                     password: [{
                         required: true,
                         message: '请输入密码',
                         trigger: 'blur'
+                    },{
+                        type: 'string', 
+                        pattern: /^\w{6,16}$/,
+                        message: '请输入6~16密码', 
+                        trigger: 'blur,change' 
                     }]
                 },
                 orderType: '超级管理员',
