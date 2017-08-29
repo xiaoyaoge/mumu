@@ -17,7 +17,10 @@ export default {
     checkID(val) {
         return /^(\d{15}|\d{17}[\da-zA-Z])$/.test(val);
     },
-    checkNum(val){
+    checkNums(val){//正浮点数
+        return /^([0-9]+\.[0-9]*[0-9])$/.test(val);
+    },
+    checkNum(val){//正整数
         return /^\d+$/.test(val);
     },
     fixNum(val) {

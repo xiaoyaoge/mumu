@@ -17,7 +17,7 @@
                             <span class="fl">订单号：</span>
                             <span class="order">{{orderInfo.orderId}}</span>
                             <span v-if="orderInfo.orderState==430" style="color:#4491e1" class="ml25">已还清</span>
-                            <span v-if="orderInfo.orderState==100" style="color:#4491e1" class="ml25">带指派面签员</span>
+                            <span v-if="orderInfo.orderState==300" style="color:#4491e1" class="ml25">待指派面签员</span>
                             <span v-if="orderInfo.orderState==310" style="color:#4491e1" class="ml25">待审核并进行重组</span>
                             <span v-if="orderInfo.orderState==330" style="color:#4491e1" class="ml25">待用户确认重组</span>
                             <span v-if="orderInfo.orderState==333" style="color:#4491e1" class="ml25">我方代偿中</span>
@@ -27,12 +27,12 @@
                         <!-- <li class="list-group-item"><span class="fl">UID：</span><span class="fr">26556</span></li> -->
                     </ul>
                 </div>
-                <div v-if="orderInfo.orderState!==430" class="info-btn" style="width:30%;">
+                <div v-if="orderInfo.orderState!==430" class="info-btn" style="width:40%;">
                     <a v-if="orderInfo.orderState!==20" @click="remarkOrder('关闭订单','close')" class="bk-button bk-default ml25" title="关闭申请"><span>关闭申请</span></a>
                     <a v-if="orderInfo.orderState==300" @click="getDelivery" class="bk-button bk-primary ml25" title="指派面签"><span>指派面签</span></a>
                     <a v-if="orderInfo.orderState==310" @click="remarkOrder('订单信息确认','isOkOrder')" class="bk-button bk-primary ml25" title="信息确认"><span>信息确认</span></a>
-                    <a v-if="orderInfo.orderState!==310&&orderInfo.orderState!==20" @click="remarkOrder('修改信息','chengeOrderInfo')" class="bk-button bk-primary ml25" title="修改信息" :class="orderInfo.orderState!==300?'':'none'"><span>修改信息</span></a>
-                    <a v-if="orderInfo.orderState==333" @click="remarkOrder('代偿完成','finishOrder')" class="bk-button bk-primary ml25" title="代偿完成"><span>代偿完成</span></a> 
+                    <a v-if="orderInfo.orderState==330||orderInfo.orderState==333" @click="remarkOrder('修改信息','chengeOrderInfo')" class="bk-button bk-primary ml25" title="修改信息" :class="orderInfo.orderState!==300?'':'none'"><span>修改信息</span></a>
+                    <a v-if="orderInfo.orderState==333" @click="remarkOrder('代偿完成','finishOrder')" class="bk-button bk-primary ml25" title="代偿完成"><span>代偿完成</span></a>
                     <div class="info-close">
                         <span v-if="orderInfo.orderState==20" class="ml15">订单已关闭</span>
                         <a class="bk-button bk-default ml25 none" @click="remarkOrder('重新开启账单','open')" title="重新开启"><span>重新开启</span></a>
@@ -49,7 +49,7 @@
                     -->
                     <div class="label-title">
                         <h4>个人信息</h4>
-                        <a class="bk-text-button bk-primary edit-btn" :class="userInfoType.eUinf?'':'none'" title="修改" @click="changeUsers">修改</a>
+                        <a v-show="userInfoType.eUinf" class="bk-text-button bk-primary edit-btn" title="修改" @click="changeUsers">修改</a>
                         <a class="bk-text-button bk-primary cancel-btn" :class="userInfoType.uinf?'':'none'" title="取消" @click="notChangUser">取消</a>
                         <a class="bk-text-button bk-primary affirm-btn" :class="userInfoType.uinf?'':'none'" title="确认" @click="isOkChangUser">确认</a>
                     </div>
@@ -70,8 +70,9 @@
                             <div class="bk-form-item mt5">
                                 <label class="bk-label ta-l" style="width:120px;">学历：</label>
                                 <div class="bk-form-content" style="margin-left:120px;">
-                                    <el-select v-model.number="userForm.degree" :class="userInfoType.ceUinf?'none':''">
-                                        <el-option v-for="item in degreeBox" :label="item.name" :value="item.id"></el-option>
+                                    <el-select v-show="!userInfoType.ceUinf" v-model.number="userForm.degree">
+                                        <el-option v-for="item in degreeBox" :label="item.name" :value="item.id">
+                                        </el-option>
                                     </el-select>
                                     <span :class="userInfoType.ceUinf?'':'none'" style=" float: left; width:100%; color: #666;text-align:right">{{degreeType(userForm.degree)}}</span>
                                 </div>
@@ -91,28 +92,22 @@
                         <a class="bk-text-button bk-primary edit-btn" :class="userInfoType.leUinf?'':'none'" title="修改" @click="changeContact">修改</a>
                         <a class="bk-text-button bk-primary cancel-btn" :class="userInfoType.luinf?'':'none'" title="取消" @click="notChangContact">取消</a>
                         <a v-show="userContact.length>0" class="bk-text-button bk-primary affirm-btn" :class="userInfoType.luinf?'':'none'" title="确认" @click="isOkContact">确认</a>
-                        <a class="bk-text-button bk-primary add-btn" :class="userInfoType.luinf?'':'none'" title="添加" @click="addContact">添加</a>
+                        <!--  <a class="bk-text-button bk-primary add-btn" :class="userInfoType.luinf?'':'none'" title="添加" @click="addContact">添加</a> -->
                     </div>
-                    <div class="label-cont mt15" :class="userContact.length>0?'':'none'">
+                    <div v-if="userGuarantor.length>0" class="label-cont mt15">
                         <form class="bk-form" id="validate_form" method="POST" action="javascript:;">
-                            <div v-for="(item,key) in userContact">
-                                <div class="bk-form-item">
-                                    <label class="bk-label ta-l" style="width:120px; padding-top:0;padding-bottom:0; padding-right: 20px;  "></label>
-                                    <div class="bk-form-content ta-r" style="margin-left:120px;">
-                                        <a class="bk-text-button bk-primary add-btn" :class="userInfoType.luinf?'':'none'" @click="deleteContact(key)">删除</a>
-                                    </div>
-                                </div>
-                                <div class="bk-form-item mt5 mb15">
-                                    <label class="bk-label ta-l" style="width:120px; padding-top:0;padding-bottom:0; padding-right: 20px;  ">
-                                        <input type="text" class="bk-form-input" style="width:80px;" maxlength="10" placeholder="输入关系" v-model="item.relation" :readonly="userInfoType.cleUinf">：</label>
-                                    <div class="bk-form-content" style="margin-left:120px;">
-                                        <input type="text" class="bk-form-input" placeholder="输入如：李四／13700000000" v-model="item.value" :readonly="userInfoType.cleUinf">
-                                    </div>
+                            <div class="bk-form-item" >
+                                <div class="bk-form-content ml0 pr20 mb10" v-for="(item,key) in userContact">
+                                    <input style="width:20%;" v-model="item.relation" maxlength="10" type="text" class="bk-form-input" placeholder="关系" value="" :readonly="userInfoType.cleUinf">
+                                    <input style="width:28%;" v-model="item.name" maxlength="10" type="text" class="bk-form-input" placeholder="姓名" value="" :readonly="userInfoType.cleUinf">
+                                    <input style="width:42%;" v-model="item.mobile" type="text" class="bk-form-input" placeholder="电话" maxlength="11" value="" :readonly="userInfoType.cleUinf">
+                                    <a class="bk-text-button bk-primary delete-btn" @click="deleteContact(key)" :class="userInfoType.luinf?'':'none'" title="删除">删除</a>
                                 </div>
                             </div>
+                            <a class="add-new-btn" :class="userInfoType.luinf?'':'none'" @click="addContact"><i class="bk-icon icon-plus-circle"></i> 新增联系人</a>
                         </form>
                     </div>
-                    <div class="nodata-cont" :class="userContact.length>0?'none':''">无联系人细信息</div>
+                    <div v-else class="nodata-cont">无联系人细信息</div>
                 </div>
                 <div class="col-md-4 col-lg-4 col-xs-4 info-label">
                     <!-- 交互说明 : 
@@ -150,8 +145,9 @@
                                 <div class="bk-form-item mt5 clearfix">
                                     <label class="bk-label ta-l" style="width:150px;">抵押物：</label>
                                     <div class="bk-form-content" style="margin-left:150px;">
-                                        <el-select v-model="item.pawns" :class="userInfoType.cdeUinf?'none':''">
-                                            <el-option v-for="item in pawnsBox" :label="item.name" :value="item.id"></el-option>
+                                        <el-select v-show="!userInfoType.cdeUinf" v-model="item.pawns">
+                                            <el-option v-for="item in pawnsBox" :label="item.name" :value="item.id">
+                                            </el-option>
                                         </el-select>
                                         <span :class="userInfoType.cdeUinf?'':'none'" style=" float: left; width:100%; color: #666;text-align:right">{{pawnsType(item.pawns)}}</span>
                                         <!-- <input type="text" class="bk-form-input" v-model="item.pawns" placeholder="" :readonly="userInfoType.cdeUinf"> -->
@@ -172,8 +168,8 @@
                     <!-- <div class="panel-subtitle">(待审核前可以修改)</div> -->
                 </div>
                 <div class="bk-panel-action fr">
-                    <div class="bk-form bk-inline-form bk-form-small">
-                        <button v-if="!typeofFun(repayInfo)&&orderInfo.orderState==310" class="bk-button bk-primary bk-button-small" @click="modifyDebt('添加账单','create',{})" title="增加债务">增加债务</button>
+                    <div v-show="orderInfo.orderState==310" class="bk-form bk-inline-form bk-form-small">
+                        <button v-if="!typeofFun(repayInfo)" class="bk-button bk-primary bk-button-small" @click="modifyDebt('添加账单','create',{})" title="增加债务">增加债务</button>
                     </div>
                 </div>
             </div>
@@ -185,6 +181,7 @@
                             <th style="width:200px" class="text-r">待还款金额</th>
                             <th>逾期情况</th>
                             <th>逾期天数</th>
+                            <th>代偿情况</th>
                             <th>图片资料</th>
                             <th>操作</th>
                         </tr>
@@ -195,15 +192,18 @@
                             <td class="text-r">{{fmoney(item.amount,2)}}</td>
                             <td>{{item.overdueStatus==1?'逾期':'未逾期'}}</td>
                             <td>{{item.overdueDays}}</td>
+                            <td>{{item.state?'已代偿':'未代偿'}}</td>
                             <td>
                                 <a v-if="item.picUrlList" class="bk-text-button" @click="viewImg(item.picUrlList)">查看图片</a>
                                 <span v-else>没有图片</span>
                             </td>
                             <td>
-                                <a v-if="!typeofFun(repayInfo)&&orderInfo.orderState==310" class="bk-text-button" @click="modifyDebt('编辑账单','modify',item)">编辑</a>
-                                <a v-if="!typeofFun(repayInfo)&&orderInfo.orderState==310" class="bk-text-button" @click="delDebt(item.orderDebtId)">删除</a>
+                                <template v-if="orderInfo.orderState==310">
+                                    <a v-if="!typeofFun(repayInfo)" class="bk-text-button" @click="modifyDebt('编辑账单','modify',item)">编辑</a>
+                                    <a v-if="!typeofFun(repayInfo)" class="bk-text-button" @click="delDebt(item.orderDebtId)">删除</a>
+                                </template>
                                 <template v-else>
-                                    <select v-if="!typeofFun(repayInfo)&&orderInfo.orderState==333" v-model="item.state" @change="changeOrderDebtState(item)" class="select">
+                                    <select v-if="orderInfo.orderState==333" v-model="item.state" @change="changeOrderDebtState(item)" class="select">
                                         <option value="0">未代偿</option>
                                         <option value="1">已代偿</option>
                                     </select>
@@ -218,6 +218,7 @@
                             <td>&nbsp</td>
                             <td>&nbsp</td>
                             <td>&nbsp</td>
+                            <td>&nbsp</td>
                         </tr>
                     </tbody>
                 </table>
@@ -229,9 +230,9 @@
                     <div class="panel-title">重组明细</div>
                 </div>
                 <div class="bk-panel-action fr">
-                    <div v-if="userInfoType.payPlanInfo" class="bk-form bk-inline-form bk-form-small">
-                        <button v-if="!typeofFun(repayInfo)&&typeofFun(repayPlan)" class="bk-button bk-primary bk-button-small" @click="viewRepayPlan('modify')" title="修改">修改</button>
-                        <button v-if="!typeofFun(repayInfo)&&!typeofFun(repayPlan)" class="bk-button bk-primary bk-button-small" @click="viewRepayPlan('create')" title="修改">增加</button>
+                    <div v-if="!typeofFun(repayInfo)&&orderInfo.orderState==310" class="bk-form bk-inline-form bk-form-small">
+                        <button v-if="typeofFun(repayPlan)" class="bk-button bk-primary bk-button-small" @click="viewRepayPlan('modify')" title="修改">修改</button>
+                        <button v-else class="bk-button bk-primary bk-button-small" @click="viewRepayPlan('create')" title="修改">增加</button>
                     </div>
                 </div>
             </div>
@@ -253,7 +254,7 @@
                             <td class="text-r">{{fmoney(repayPlan.monFee,2)}}</td>
                             <td>{{repayPlan.fqNum}}</td>
                             <td>{{repayPlan.overDueDays}}</td>
-                            <td>{{repayPlan.repayType}}</td>
+                            <td><span v-show="typeofFun(repayPlan)">{{repayPlan.repayType||'等额本息按日计息'}}</span></td>
                             <td>
                                 <a v-show="typeofFun(repayPlan)" class="bk-text-button" @click="viewRepayPlan('view')">查看详情</a>
                             </td>
@@ -268,7 +269,7 @@
                     <div class="panel-title">还款明细</div>
                 </div>
                 <div class="bk-panel-action fr">
-                    <div v-if="userInfoType.payPlanInfo" class="bk-form bk-inline-form bk-form-small">
+                    <div v-show="!(orderInfo.orderState==430||orderInfo.orderState==20)" class="bk-form bk-inline-form bk-form-small">
                         <button class="bk-button bk-primary bk-button-small" @click="viewRepayInfo('modify')" title="修改">修改</button>
                     </div>
                 </div>
@@ -426,7 +427,8 @@
                 </el-form-item>
                 <el-form-item label="逾期情况">
                     <el-select v-model.number="debtForm.overdueStatus" @change="chengeOverdueStatus">
-                        <el-option v-for="item in overdueStatus" :label="item.name" :value="item.id"></el-option>
+                        <el-option v-for="item in overdueStatus" :label="item.name" :value="item.id">
+                        </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item v-show="debtForm.overdueStatus==1" label="逾期天数" prop="overdueDays" :rules="[
@@ -508,11 +510,11 @@
                             <td>{{key+1}}</td>
                             <td class="text-r">{{fmoney(item.capital,2)}}</td>
                             <td class="text-r">
-                                <input v-if="item.repayState<20" v-model="item.monFee" style="width:60px;" type="text" value="32">
+                                <input v-if="item.repayState<20" v-model="item.monFee" style="width:60px;" type="text">
                                 <span v-else>{{fmoney(item.monFee,2)}}</span>
                             </td>
                             <td>
-                                <input v-if="(item.repayState<20&&item.penalty!=0)" v-model="item.penalty" style="width:60px;" type="text" value="32">
+                                <input v-if="(item.repayState<20&&item.penalty!=0)" v-model="item.penalty" style="width:60px;" type="text">
                                 <span v-else>{{fmoney(item.penalty,2)}}</span>
                             </td>
                             <td>
@@ -569,7 +571,7 @@ export default {
                 { name: "房子", id: '1' },
                 { name: "车子", id: '2' },
                 { name: "保险", id: '3' },
-                {name:"其它",id:''}
+                { name: "其它", id: '' }
             ],
             degreeBox: [
                 { name: "高中及以下", id: 1 },
@@ -582,13 +584,13 @@ export default {
             ],
             userInfoType: {
                 ceUinf: true, //点击编辑
-                eUinf: false, //个人信息显示修改
+                eUinf: true, //个人信息显示修改
                 uinf: false, //个人显示 确认取消
                 cleUinf: true, //点击编辑
-                leUinf: false, //联系人信息显示修改
+                leUinf: true, //联系人信息显示修改
                 luinf: false, //个人显示 确认取消
                 cdeUinf: true, //点击编辑
-                deUinf: false, //联系人信息显示修改
+                deUinf: true, //联系人信息显示修改
                 duinf: false, //个人显示 确认取消 
                 debUinf: false,
                 payPlan: false,
@@ -746,7 +748,7 @@ export default {
                 case 2:
                     return '车子';
                 case 3:
-                    return '保险'; 
+                    return '保险';
                 default:
                     return '其他';
             }
@@ -763,11 +765,11 @@ export default {
             }, (res) => {
                 this.$http.aop(res, () => {
                     this.changeUserInfo(res.body.data.order.orderState); //显示／隐藏 修改按钮
-                    this.orderInfo = res.body.data.order;
-                    this.repayInfo = res.body.data.repayInfo || {};
-                    this.repayPlan = res.body.data.repayPlan || {};
+                    this.orderInfo = res.body.data.order; //订单信息
+                    this.repayInfo = res.body.data.repayInfo || {}; //还款明细
+                    this.repayPlan = res.body.data.repayPlan || {}; //重组明细
                     this.logList = res.body.data.logList;
-                    this.debtList = res.body.data.debtList;
+                    this.debtList = res.body.data.debtList; //债务信息
 
                     if (this.typeofFun(this.debtList)) {
                         this.debtList.forEach((item, index) => {
@@ -830,8 +832,7 @@ export default {
                 cid: '',
                 mobile: '',
                 name: '',
-                relation: '',
-                value: ''
+                relation: ''
             }
             this.userContact.push(contact);
         },
@@ -850,9 +851,9 @@ export default {
             }, (res) => {
                 this.$http.aop(res, () => {
                     this.userContact = res.body.data.contactList || [];
-                    for (let i = 0; i < this.userContact.length; i++) {
-                        this.userContact[i].value = this.userContact[i].name + '/' + this.userContact[i].mobile;
-                    }
+                    // for (let i = 0; i < this.userContact.length; i++) {
+                    //     this.userContact[i].value = this.userContact[i].name + '/' + this.userContact[i].mobile;
+                    // }
                 });
             });
         },
@@ -928,19 +929,9 @@ export default {
         },
         isOkContact() { //保存联系人 
             var params = {
-                contactList: [],
+                contactList: this.userContact,
                 uid: this.orderInfo.uid
             };
-            this.userContact.forEach((item) => {
-                var aVal = item.value.split('/');
-                var val = {
-                    cid: item.cid,
-                    name: aVal[0],
-                    mobile: aVal[1],
-                    relation: item.relation
-                };
-                params.contactList.push(val);
-            });
             if (this.checkContact(params.contactList)) {
                 this.$confirm('是否确认，修改联系人信息？', '提示', {}).then(() => {
                     this.$http.ajaxPost({
@@ -1073,8 +1064,8 @@ export default {
             this.userInfoType.eUinf = false;
             this.userInfoType.uinf = true;
         },
-        changeUserInfo(state) { //显示/隐藏 修改信息 按钮 
-            if (parseInt(state) === 330) {
+        changeUserInfo(state) { //显示/隐藏 修改信息 按钮  
+            if ((parseInt(state) === 20 || parseInt(state) === 430)) {
                 this.userInfoType.eUinf = false;
                 this.userInfoType.leUinf = false;
                 this.userInfoType.deUinf = false;
@@ -1144,7 +1135,7 @@ export default {
                 }
             });
         },
-        isOKSubmit() { //确认订单信息 
+        isOKSubmit() { //确认订单信息   
             this.$confirm('是否确认，当前用户信息？', '提示', {}).then(() => {
                 let para = Object.assign({}, this.descForm);
                 para.orderId = this.orderInfo.orderId;
@@ -1172,6 +1163,14 @@ export default {
         remarkOrder(str, type) { //状态操作按钮
             this.descTitle = str;
             this.descRemarkType = type
+            if (!this.typeofFun(this.repayPlan) && type === "isOkOrder") {
+                this.$message({
+                    type: 'info',
+                    message: '重组明细不能为空'
+                });
+                return;
+            }
+
             this.descFormVisible = true;
         },
         openOrder() { //重新开启账单
@@ -1277,7 +1276,7 @@ export default {
                     });
                 }
             });
-        }, 
+        },
         remarkOrderSubmit(type) { //填写备注  
             switch (type) {
                 case 'close': //关闭订单
@@ -1286,7 +1285,7 @@ export default {
                 case 'open': //重新开启点单
                     this.openOrder();
                     return '本科';
-                case 'isOkOrder':
+                case 'isOkOrder': //确认订单信息  
                     this.isOKSubmit();
                     return;
                 case 'finishOrder':
@@ -1351,13 +1350,13 @@ export default {
                 Object.keys(item).forEach((val) => {
                     switch (val) {
                         case 'capital':
-                            if (!validate.checkNum(item[val])) {
+                            if (!validate.checkNums(item[val])) {
                                 text = '请填写还款金额(为大于等于0的数字）';
                                 isOk = false;
                             }
                             break;
                         case 'monFee':
-                            if (!validate.checkNum(item[val])) {
+                            if (!validate.checkNums(item[val])) {
                                 text = '请填写利息（为大于等于0的数字）';
                                 isOk = false;
                             }
@@ -1377,20 +1376,17 @@ export default {
             }
             return true;
         },
-        severRepayPlanSubmit() { //保存重组明细
-            var repayInfoList = [];
-            this.repayPlanList.forEach((item, index) => {
-                item.repayIndex = index + 1;
-                item.capital = item.capital * 100;
-                item.monFee = item.monFee * 100;
-                repayInfoList.push(item);
-
-            });
-
-            if (this.checkRepayPlan(repayInfoList)) {
+        severRepayPlanSubmit() { //保存重组明细 
+            if (this.checkRepayPlan(this.repayPlanList)) {
                 this.$confirm('是否确认，当前修改重组明细？', '提示', {}).then(() => {
-
-
+                    let repayInfoList = [];
+                    this.repayPlanList.forEach((item, index) => {
+                        item.repayIndex = index + 1;
+                        item.capital = item.capital * 100;
+                        item.monFee = item.monFee * 100;
+                        item.repayDate = this.dateTime(item.repayDate);
+                        repayInfoList.push(item);
+                    });
                     //return ;
                     let para = {
                         repayInfo: JSON.stringify(repayInfoList),
@@ -1411,6 +1407,7 @@ export default {
                         })
                     });
                     this.repayPlanFormVisible = false;
+
                 }).catch(() => {
                     this.$message({
                         type: 'info',
@@ -1442,14 +1439,14 @@ export default {
                 })
             });
         },
-        checkRepayInfo(data) { //验证重组明细
+        checkRepayInfo(data) { //验证还款明细
             let isOk = true;
             let text = '';
             data.forEach((item) => {
                 Object.keys(item).forEach((val) => {
                     switch (val) {
                         case 'monFee':
-                            if (!validate.checkNum(item[val])) {
+                            if (!validate.checkNums(item[val])) {
                                 text = '请填写利息（为大于等于0的数字）';
                                 isOk = false;
                             }
@@ -1469,6 +1466,7 @@ export default {
                     this.repayInfoList.forEach((item, index) => {
                         this.repayInfoList[index].monFee = item.monFee * 100;
                         this.repayInfoList[index].penalty = item.penalty * 100;
+                        this.repayInfoList[index].repayDate = this.dateTime(this.repayInfoList[index].repayDate);
                     })
                     let para = {
                         repayInfoList: this.repayInfoList,
